@@ -1,0 +1,10 @@
+anthropic<1,>=0.60
+fastapi<1,>=0.115
+psycopg[binary]<4,>=3.2
+python-dotenv<2,>=1
+uvicorn[standard]<1,>=0.30
+typesafe-sdk<1,>=0.1.0
+
+[test]
+httpx<1,>=0.27
+pytest<9,>=8

@@ -36,6 +36,34 @@ def canonical_state_hash(state: dict[str, Any]) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def fail_closed_decision(router: Any, state_sha256: str, reason: str) -> dict[str, Any]:
+    """Deterministic fallback decision when System One cannot answer.
+
+    A0 non-negotiable: a provider failure must never become GREEN or an
+    auto-close. The item is proposed straight to the human review queue with
+    full lineage versions so it stays replayable.
+    """
+    return {
+        "model_id": getattr(router, "public_model", "unavailable"),
+        "provider": "none",
+        "model_version": None,
+        "usage": None,
+        "sampler_version": router.sampler_version,
+        "question_schema_version": router.question_schema_version,
+        "threshold_policy_version": router.threshold_policy_version,
+        "state_sha256": state_sha256,
+        "latency_ms": 0,
+        "answers": {},
+        "gate_probabilities": {},
+        "p_valid_case": None,
+        "p_serious_or_denial": None,
+        "confidence_band": "YELLOW_REVIEW",
+        "recommended_route": None,
+        "outcome": "fail_closed",
+        "fail_closed_reason": reason[:200],
+    }
+
+
 def record_state_and_source(
     connection: Any,
     *,
@@ -47,6 +75,7 @@ def record_state_and_source(
     source_uid: str,
     raw_payload: dict[str, Any] | str,
     strategy_id: int | None = None,
+    tenant_id: str | None = None,
 ) -> StateWrite:
     if domain not in DOMAINS:
         raise ValueError(f"Unsupported domain: {domain}")

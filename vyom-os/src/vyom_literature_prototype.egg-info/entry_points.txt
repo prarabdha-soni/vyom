@@ -1,0 +1,7 @@
+[console_scripts]
+vyom-api = vyom_literature.server:main
+vyom-export-training = vyom_literature.training_export:main
+vyom-fetch = vyom_literature.fetch:main
+vyom-gold-import = vyom_literature.gold_import:main
+vyom-report = vyom_literature.weekly_report:main
+vyom-sweep = vyom_literature.sweep:main
