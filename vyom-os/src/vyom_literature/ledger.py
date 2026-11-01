@@ -163,6 +163,16 @@ def append_sys1_decision(connection: Any, *, state_id: int, decision: dict[str, 
     if missing:
         raise ValueError(f"Decision is missing required lineage fields: {', '.join(missing)}")
 
+    # B1 fail-closed invariant (release-blocking): a decision whose outcome is
+    # not a genuine model answer must never carry a GREEN band. Provider
+    # failures, malformed output, and retries exhausted route to humans only.
+    # This check lives at the ledger boundary so no code path can bypass it.
+    outcome = str(decision.get("outcome", "ok"))
+    if outcome != "ok" and decision["confidence_band"] in {"GREEN_CLOSE", "GREEN_PASS"}:
+        raise ValueError(
+            "fail-closed violation: non-ok System One outcome cannot produce a GREEN band"
+        )
+
     with connection.transaction():
         with connection.cursor() as cursor:
             cursor.execute(
