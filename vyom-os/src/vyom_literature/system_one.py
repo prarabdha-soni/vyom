@@ -288,13 +288,65 @@ class SystemOneRouter:
             ).encode("utf-8")
         ).hexdigest()
         started = time.perf_counter_ns()
-        response = client.system_one(state=normalized_state, questions=questions, model=model)
+        # A0 fail-closed rule: any provider exception (timeout, 5xx, rate limit,
+        # malformed or out-of-schema output) must NOT be swallowed into a GREEN
+        # band. We record an explicit PROVIDER_FAILURE decision whose band is
+        # YELLOW_REVIEW so the deterministic router sends the item to a human.
+        # Only genuine model answers can ever produce a GREEN band.
+        try:
+            response = client.system_one(state=normalized_state, questions=questions, model=model)
+        except Exception as error:
+            latency_ms = (time.perf_counter_ns() - started) // 1_000_000
+            return {
+                "model_id": model,
+                "provider": getattr(client, "provider_name", "unknown"),
+                "model_version": getattr(client, "last_model_version", None),
+                "usage": getattr(client, "last_usage", None),
+                "sampler_version": self.sampler_version,
+                "question_schema_version": QUESTION_SCHEMA_VERSION,
+                "threshold_policy_version": THRESHOLD_POLICY_VERSION,
+                "state_sha256": state_sha256,
+                "latency_ms": latency_ms,
+                "answers": {},
+                "gate_probabilities": {},
+                "p_valid_case": None,
+                "p_serious_or_denial": None,
+                "confidence_band": "YELLOW_REVIEW",
+                "recommended_route": None,
+                "outcome": "provider_failure",
+                "fail_closed_reason": f"{type(error).__name__}: {str(error)[:200]}",
+            }
         latency_ms = (time.perf_counter_ns() - started) // 1_000_000
-        answers = _answer_dict(response)
-        band, gate_probabilities, p_risk, recommended_route = _route(domain, answers)
+        try:
+            answers = _answer_dict(response)
+            band, gate_probabilities, p_risk, recommended_route = _route(domain, answers)
+        except (KeyError, TypeError, ValueError) as error:
+            # Malformed / incomplete proposal — untrusted output never routes.
+            return {
+                "model_id": model,
+                "provider": getattr(client, "provider_name", "unknown"),
+                "model_version": getattr(client, "last_model_version", None),
+                "usage": getattr(client, "last_usage", None),
+                "sampler_version": self.sampler_version,
+                "question_schema_version": QUESTION_SCHEMA_VERSION,
+                "threshold_policy_version": THRESHOLD_POLICY_VERSION,
+                "state_sha256": state_sha256,
+                "latency_ms": latency_ms,
+                "answers": {},
+                "gate_probabilities": {},
+                "p_valid_case": None,
+                "p_serious_or_denial": None,
+                "confidence_band": "YELLOW_REVIEW",
+                "recommended_route": None,
+                "outcome": "malformed_output",
+                "fail_closed_reason": f"{type(error).__name__}: {str(error)[:200]}",
+            }
 
         return {
             "model_id": model,
+            "provider": getattr(client, "provider_name", "unknown"),
+            "model_version": getattr(client, "last_model_version", None),
+            "usage": getattr(client, "last_usage", None),
             "sampler_version": self.sampler_version,
             "question_schema_version": QUESTION_SCHEMA_VERSION,
             "threshold_policy_version": THRESHOLD_POLICY_VERSION,
@@ -306,4 +358,5 @@ class SystemOneRouter:
             "p_serious_or_denial": p_risk,
             "confidence_band": band,
             "recommended_route": recommended_route,
+            "outcome": "ok",
         }

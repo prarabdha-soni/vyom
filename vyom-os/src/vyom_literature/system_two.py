@@ -57,6 +57,11 @@ def _source_text(state: dict[str, Any]) -> str:
 
 
 def _prompt(domain: Domain, state: dict[str, Any], decision: dict[str, Any]) -> str:
+    return build_system_two_prompt(domain, state, decision)
+
+
+def build_system_two_prompt(domain: Domain, state: dict[str, Any], decision: dict[str, Any]) -> str:
+    """Single prompt builder shared by every System Two provider (incl. Vertex)."""
     return json.dumps(
         {
             "domain": domain,

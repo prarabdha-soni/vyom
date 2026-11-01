@@ -135,12 +135,17 @@ def test_rcm_route_is_computed_from_gates_not_model_choice():
     assert result["recommended_route"] == "HOLD_MISSING_LAB_PROOF"
 
 
-def test_invalid_probability_fails_closed():
+def test_invalid_probability_fails_closed_to_human_review():
+    """A0: an out-of-contract probability is malformed output — it must route
+    to a human (YELLOW_REVIEW) and can never become GREEN or auto-close."""
     answers = _pv_answers(patient=1.2)
     router = _router(FakeClient(answers), FakeClient(_rcm_answers()))
 
-    with pytest.raises(ValueError, match="between 0 and 1"):
-        router.evaluate("pv_literature", {"abstract": "Mock"})
+    decision = router.evaluate("pv_literature", {"abstract": "Mock"})
+
+    assert decision["confidence_band"] == "YELLOW_REVIEW"
+    assert decision["outcome"] == "malformed_output"
+    assert "between 0 and 1" in decision["fail_closed_reason"]
 
 
 def test_unknown_domain_is_rejected_before_model_call():
