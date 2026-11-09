@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+.env*
+!.env.example
+/vyom-web/node_modules/
+/vyom-web/.next/
+/vyom-web/tsconfig.tsbuildinfo

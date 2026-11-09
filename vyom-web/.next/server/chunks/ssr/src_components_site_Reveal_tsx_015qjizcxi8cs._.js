@@ -1,3 +1,0 @@
-module.exports=[1576,a=>{"use strict";var b=a.i(72131);a.s(["Reveal",0,function(){return(0,b.useEffect)(()=>{if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;let a=Array.from(document.querySelectorAll("[data-reveal]"));if(0===a.length)return;let b=new IntersectionObserver(a=>{for(let c of a){if(!c.isIntersecting)continue;let a=c.target;a.dataset.revealShown="true",b.unobserve(a)}},{rootMargin:"0px 0px -12% 0px",threshold:.05});for(let c of a)c.getBoundingClientRect().top<.9*window.innerHeight||(c.dataset.revealArmed="true",b.observe(c));return()=>b.disconnect()},[]),null}])}];
-
-//# sourceMappingURL=src_components_site_Reveal_tsx_015qjizcxi8cs._.js.map

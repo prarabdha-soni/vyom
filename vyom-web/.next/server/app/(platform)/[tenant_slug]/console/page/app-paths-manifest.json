@@ -1,3 +1,0 @@
-{
-  "/(platform)/[tenant_slug]/console/page": "app/(platform)/[tenant_slug]/console/page.js"
-}
