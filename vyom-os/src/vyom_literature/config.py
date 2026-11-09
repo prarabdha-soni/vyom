@@ -20,7 +20,7 @@ class Settings:
 
     @classmethod
     def from_env(cls) -> Settings:
-        load_dotenv(BACKEND_ROOT / ".env", override=False)
+        load_dotenv(BACKEND_ROOT / ".env.local", override=False)
         return cls(
             database_url=os.environ.get("DATABASE_URL"),
             anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY"),

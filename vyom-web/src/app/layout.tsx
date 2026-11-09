@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { IBM_Plex_Mono, Instrument_Sans } from 'next/font/google';
+import { homeMeta } from '@/content/home';
 import { siteConfig } from '~/site.config';
 import './globals.css';
 
@@ -20,11 +21,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: 'Vyom — The AI-native operating system for patient safety',
+    default: homeMeta.title,
     template: '%s — Vyom',
   },
-  description:
-    'Connect fragmented safety evidence, trace products across the supply chain and support faster, accountable safety review.',
+  description: homeMeta.description,
   // Stays noindex until site.config.ts flips indexable to true.
   robots: siteConfig.indexable
     ? { index: true, follow: true }

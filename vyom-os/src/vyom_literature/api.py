@@ -88,6 +88,7 @@ def create_app(
     reviewer_tokens: dict[str, ReviewerIdentity] | None = None,
     literature_runner: Callable[[date, date], list[dict[str, Any]]] | None = None,
     system_two_router: SystemTwoRouter | None = None,
+    hospital_rcm_enabled: bool = False,
 ) -> FastAPI:
     if not api_token:
         raise ValueError("An API bearer token is required")
@@ -114,7 +115,6 @@ def create_app(
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    @app.post("/v1/rcm/preflight", dependencies=[Depends(require_token)])
     def rcm_preflight(request: HospitalPreflightRequest) -> dict[str, Any]:
         normalized_state = {**request.normalized_state, "domain": "hospital_rcm"}
         _validate_state_size(normalized_state)
@@ -193,6 +193,9 @@ def create_app(
             "requires_human_release": True,
             "synthesis": synthesis,
         }
+
+    if hospital_rcm_enabled:
+        app.post("/v1/rcm/preflight", dependencies=[Depends(require_token)])(rcm_preflight)
 
     @app.post("/v1/icsr/intake", dependencies=[Depends(require_token)])
     def icsr_intake(request: IcsrIntakeRequest) -> dict[str, Any]:
@@ -373,7 +376,7 @@ def create_app_from_env() -> FastAPI:
     from vyom_literature.config import BACKEND_ROOT, Settings
     from vyom_literature.sweep import build_environment_sweep
 
-    load_dotenv(BACKEND_ROOT / ".env", override=False)
+    load_dotenv(BACKEND_ROOT / ".env.local", override=False)
     settings = Settings.from_env()
     router = SystemOneRouter.from_env()
     system_two_router = SystemTwoRouter.from_env()
@@ -413,4 +416,6 @@ def create_app_from_env() -> FastAPI:
         reviewer_tokens=reviewer_tokens,
         literature_runner=literature_runner,
         system_two_router=system_two_router,
+        hospital_rcm_enabled=os.environ.get("ENABLE_HOSPITAL_RCM", "").strip().lower()
+        in {"1", "true", "yes", "on"},
     )

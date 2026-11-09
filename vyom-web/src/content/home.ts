@@ -6,13 +6,13 @@
  */
 
 export const homeMeta = {
-  title: 'Vyom — The AI-native operating system for patient safety',
+  title: 'Vyom — The operating system for modern drug safety and quality',
   description:
-    'Connect fragmented safety evidence, trace products across the supply chain and support faster, accountable safety review. Product screens show sample data.',
+    'The operating system for modern drug safety and quality. Connect fragmented evidence and workflows with traceable review across literature, cases and product-quality concerns.',
 } as const;
 
 export const hero = {
-  pill: 'AI-NATIVE PATIENT SAFETY',
+  pill: 'AI-NATIVE DRUG SAFETY & QUALITY',
   /**
    * One sentence that wraps naturally. Split so `highlight` can take the
    * accent colour and the underline without the component hardcoding the

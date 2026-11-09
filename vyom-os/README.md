@@ -13,10 +13,16 @@ Use Python 3.11 or newer:
 
 ```sh
 python -m pip install -e '.[test]'
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Fill `.env` locally. Never commit it or paste secrets into chat. Use a rotated Postgres credential and URL-encode reserved characters in `DATABASE_URL`.
+Fill `.env.local` locally. Never commit it or paste secrets into chat. Use a rotated Postgres credential and URL-encode reserved characters in `DATABASE_URL`.
+
+Start the Docker Compose services with the same local environment file:
+
+```sh
+docker compose --env-file .env.local up --build
+```
 
 Required for v2:
 

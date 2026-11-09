@@ -39,7 +39,7 @@ class FakeConnection:
         return False
 
 
-def _client(monkeypatch, *, runner=None):
+def _client(monkeypatch, *, runner=None, hospital_rcm_enabled=False):
     router = FakeRouter()
     writes = {"states": 0, "decisions": 0}
 
@@ -79,6 +79,7 @@ def _client(monkeypatch, *, runner=None):
             )
         },
         literature_runner=runner,
+        hospital_rcm_enabled=hospital_rcm_enabled,
     )
     return TestClient(app), router, writes
 
@@ -93,7 +94,7 @@ def test_health_is_available_without_authentication(monkeypatch):
 
 
 def test_rcm_route_requires_token_and_persists_ledger(monkeypatch):
-    client, router, writes = _client(monkeypatch)
+    client, router, writes = _client(monkeypatch, hospital_rcm_enabled=True)
     body = {
         "admission_uid": "mock-admission-1",
         "payer_code": "mock-payer",
@@ -117,7 +118,7 @@ def test_rcm_route_requires_token_and_persists_ledger(monkeypatch):
 
 
 def test_rcm_retry_returns_existing_decision_without_duplicate(monkeypatch):
-    client, _, writes = _client(monkeypatch)
+    client, _, writes = _client(monkeypatch, hospital_rcm_enabled=True)
     body = {
         "admission_uid": "mock-admission-2",
         "payer_code": "mock-payer",
@@ -135,7 +136,7 @@ def test_rcm_retry_returns_existing_decision_without_duplicate(monkeypatch):
 
 
 def test_rcm_rejects_oversized_normalized_state_before_model_call(monkeypatch):
-    client, router, _ = _client(monkeypatch)
+    client, router, _ = _client(monkeypatch, hospital_rcm_enabled=True)
     body = {
         "admission_uid": "mock-admission-3",
         "payer_code": "mock-payer",
@@ -149,6 +150,22 @@ def test_rcm_rejects_oversized_normalized_state_before_model_call(monkeypatch):
     )
 
     assert response.status_code == 413
+    assert router.calls == []
+
+
+def test_rcm_route_is_not_registered_by_default(monkeypatch):
+    client, router, _ = _client(monkeypatch)
+    response = client.post(
+        "/v1/rcm/preflight",
+        json={
+            "admission_uid": "mock-admission-disabled",
+            "payer_code": "mock-payer",
+            "normalized_state": {},
+        },
+        headers={"Authorization": "Bearer unit-test-token"},
+    )
+
+    assert response.status_code == 404
     assert router.calls == []
 
 
