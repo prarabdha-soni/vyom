@@ -72,7 +72,6 @@ def build_system_two_prompt(domain: Domain, state: dict[str, Any], decision: dic
                 "Return JSON with draft_narrative and cited_passages, an array of exact source quotations.",
                 "Every factual statement must be supported by an exact quotation from source_text.",
                 "Do not infer missing facts or assign MedDRA/ICD codes not explicitly supplied in state.",
-                "For RCM, recommend holds or missing evidence only; never submit or approve a claim.",
             ],
         },
         ensure_ascii=False,

@@ -162,7 +162,7 @@ def test_decision_appends_only_when_state_hash_matches():
         "latency_ms": 20,
         "answers": {"has_adverse_event": {"probability": 0.9}},
         "p_valid_case": None,
-        "p_serious_or_denial": 0.1,
+        "p_serious_event": 0.1,
         "confidence_band": "YELLOW_REVIEW",
     }
 
@@ -176,13 +176,13 @@ def test_decision_rejects_mismatched_state_hash():
     connection = MemoryConnection()
     stored = record_state_and_source(
         connection,
-        domain="hospital_rcm",
+        domain="pv_icsr",
         dedup_key="admission:mock",
-        title_or_header="Mock admission",
-        normalized_state={"claim": "mock"},
-        source="hospital_his",
+        title_or_header="Mock ICSR",
+        normalized_state={"report": "mock"},
+        source="partner_e2b",
         source_uid="mock-1",
-        raw_payload={"claim": "mock"},
+        raw_payload={"report": "mock"},
     )
     decision = {
         "model_id": "local-test",

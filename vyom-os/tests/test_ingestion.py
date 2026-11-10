@@ -42,7 +42,7 @@ class FakeRouter:
             "latency_ms": 12,
             "answers": {},
             "p_valid_case": None,
-            "p_serious_or_denial": 0.1,
+            "p_serious_event": 0.1,
             "confidence_band": "YELLOW_REVIEW",
         }
 

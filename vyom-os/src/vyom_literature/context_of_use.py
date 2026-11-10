@@ -19,7 +19,6 @@ from typing import Any
 
 from vyom_literature.screening import CRITERIA, SPECIAL_SITUATIONS
 from vyom_literature.system_one import (
-    HOSPITAL_RCM_QUESTIONS,
     PV_ICSRS_QUESTIONS,
     PV_LITERATURE_QUESTIONS,
     QUESTION_SCHEMA_VERSION,
@@ -62,9 +61,9 @@ _GOLD_EVAL = (
     "Frozen gold set: per-question agreement against adjudicated human labels; "
     "CI gate fails if recall drops below the last released value."
 )
-_ADMISSIONS_EVAL = (
-    "Admissions log sampling: monthly random 10% human re-screen of items the "
-    "question routed, plus every disagreement escalated to a safety physician."
+_LOCAL_CASE_EVAL = (
+    "Local ICSR log sampling: human re-screen of routed items and every "
+    "disagreement escalated to a safety physician."
 )
 
 
@@ -118,27 +117,13 @@ def _build_records() -> tuple[ContextOfUse, ...]:
             "Proposal only: expectedness relative to reference information.",
             "Incorrect unexpectedness misroutes SUSAR handling.",
         ),
-        "claim_submission_route": (
-            "Hospital RCM claim preflight route proposal.",
-            "Wrong route sends claims to manual review unnecessarily or bypasses checks.",
-        ),
-        "diagnostic_proof_attached": (
-            "Hospital RCM preflight evidence gate probability.",
-            "Over-trusted probability auto-passes unsupported claims.",
-        ),
     }
     for key in PV_ICSRS_QUESTIONS:
         purpose, risk = icsr_purposes.get(
             key, ("Bounded ICSR triage signal.", "Misprioritisation delays human review.")
         )
-        # pv_icsr stays local-only by default; same gold/admissions evaluation.
-        records.append(_c("pv_icsr", key, purpose, risk, _ADMISSIONS_EVAL))
-
-    for key in HOSPITAL_RCM_QUESTIONS:
-        purpose, risk = icsr_purposes.get(
-            key, ("Bounded hospital RCM preflight signal.", "Wrong routing delays claim settlement.")
-        )
-        records.append(_c("hospital_rcm", key, purpose, risk, _ADMISSIONS_EVAL))
+        # pv_icsr stays local-only by default and is evaluated on local ICSR samples.
+        records.append(_c("pv_icsr", key, purpose, risk, _LOCAL_CASE_EVAL))
 
     # Screening prompt questions (triage / second look) are versioned through
     # PROMPT_VERSION but their sub-questions must also carry context-of-use.
@@ -175,7 +160,6 @@ def all_questions() -> dict[str, dict[str, str]]:
     return {
         "pv_literature": {key: "" for key in PV_LITERATURE_QUESTIONS},
         "pv_icsr": {key: "" for key in PV_ICSRS_QUESTIONS},
-        "hospital_rcm": {key: "" for key in HOSPITAL_RCM_QUESTIONS},
         "screening_triage": {f"criterion:{c}": "" for c in CRITERIA},
         "screening_special": {f"special_situation:{s}": "" for s in SPECIAL_SITUATIONS},
     }

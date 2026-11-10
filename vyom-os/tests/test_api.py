@@ -21,12 +21,12 @@ class FakeRouter:
             "threshold_policy_version": 4,
             "state_sha256": canonical_state_hash(state),
             "latency_ms": 8,
-            "answers": {"claim_submission_route": {"choice": "READY_FOR_HUMAN_RELEASE"}},
-            "gate_probabilities": {"diagnostic_proof_attached": 0.98},
+            "answers": {},
+            "gate_probabilities": {},
             "p_valid_case": None,
-            "p_serious_or_denial": None,
+            "p_serious_event": None,
             "confidence_band": "GREEN_PASS",
-            "recommended_route": "READY_FOR_HUMAN_RELEASE",
+            "recommended_route": None,
         }
 
 
@@ -39,7 +39,7 @@ class FakeConnection:
         return False
 
 
-def _client(monkeypatch, *, runner=None, hospital_rcm_enabled=False):
+def _client(monkeypatch, *, runner=None):
     router = FakeRouter()
     writes = {"states": 0, "decisions": 0}
 
@@ -79,7 +79,6 @@ def _client(monkeypatch, *, runner=None, hospital_rcm_enabled=False):
             )
         },
         literature_runner=runner,
-        hospital_rcm_enabled=hospital_rcm_enabled,
     )
     return TestClient(app), router, writes
 
@@ -91,82 +90,6 @@ def test_health_is_available_without_authentication(monkeypatch):
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
-
-
-def test_rcm_route_requires_token_and_persists_ledger(monkeypatch):
-    client, router, writes = _client(monkeypatch, hospital_rcm_enabled=True)
-    body = {
-        "admission_uid": "mock-admission-1",
-        "payer_code": "mock-payer",
-        "normalized_state": {"diagnosis": "mock", "treatment": ["mock"]},
-    }
-
-    denied = client.post("/v1/rcm/preflight", json=body)
-    accepted = client.post(
-        "/v1/rcm/preflight",
-        json=body,
-        headers={"Authorization": "Bearer unit-test-token"},
-    )
-
-    assert denied.status_code == 401
-    assert accepted.status_code == 200
-    assert accepted.json()["requires_human_release"] is True
-    assert accepted.json()["recommended_route"] == "READY_FOR_HUMAN_RELEASE"
-    assert writes == {"states": 1, "decisions": 1}
-    assert router.calls[0][0] == "hospital_rcm"
-    assert router.calls[0][1]["domain"] == "hospital_rcm"
-
-
-def test_rcm_retry_returns_existing_decision_without_duplicate(monkeypatch):
-    client, _, writes = _client(monkeypatch, hospital_rcm_enabled=True)
-    body = {
-        "admission_uid": "mock-admission-2",
-        "payer_code": "mock-payer",
-        "normalized_state": {"diagnosis": "mock"},
-    }
-    headers = {"Authorization": "Bearer unit-test-token"}
-
-    first = client.post("/v1/rcm/preflight", json=body, headers=headers)
-    retry = client.post("/v1/rcm/preflight", json=body, headers=headers)
-
-    assert first.status_code == 200
-    assert retry.status_code == 200
-    assert retry.json()["decision_id"] == first.json()["decision_id"]
-    assert writes["decisions"] == 1
-
-
-def test_rcm_rejects_oversized_normalized_state_before_model_call(monkeypatch):
-    client, router, _ = _client(monkeypatch, hospital_rcm_enabled=True)
-    body = {
-        "admission_uid": "mock-admission-3",
-        "payer_code": "mock-payer",
-        "normalized_state": {"text": "x" * MAX_STATE_BYTES},
-    }
-
-    response = client.post(
-        "/v1/rcm/preflight",
-        json=body,
-        headers={"Authorization": "Bearer unit-test-token"},
-    )
-
-    assert response.status_code == 413
-    assert router.calls == []
-
-
-def test_rcm_route_is_not_registered_by_default(monkeypatch):
-    client, router, _ = _client(monkeypatch)
-    response = client.post(
-        "/v1/rcm/preflight",
-        json={
-            "admission_uid": "mock-admission-disabled",
-            "payer_code": "mock-payer",
-            "normalized_state": {},
-        },
-        headers={"Authorization": "Bearer unit-test-token"},
-    )
-
-    assert response.status_code == 404
-    assert router.calls == []
 
 
 def test_literature_sweep_checks_dates_and_returns_runner_result(monkeypatch):

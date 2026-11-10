@@ -5,7 +5,7 @@ This directory is **vyom-os** (FastAPI). It contains two distinct paths:
 - **v1 prototype:** the earlier PubMed/Europe PMC fetcher and Claude batch flow (`vyom-fetch`).
 - **v2 foundation:** System One routing, an append-only decision ledger, and a public-literature sweep (`vyom-sweep`).
 
-The v2 path includes structured hospital preflight and ICSR intake APIs, a public-literature sweep, selective System Two drafting, reviewer APIs, and gold-based evaluation. OCR/PDF extraction, a browser workbench, FHIR NHCX and E2B(R3) serializers, automated scheduling, enterprise identity, and production authorization remain deployment/product work.
+The v2 path includes ICSR intake APIs, a public-literature sweep, selective System Two drafting, reviewer APIs, and gold-based evaluation. OCR/PDF extraction, a browser workbench, FHIR NHCX and E2B(R3) serializers, automated scheduling, enterprise identity, and production authorization remain deployment/product work.
 
 ## Setup
 
@@ -28,13 +28,13 @@ Required for v2:
 
 - `DATABASE_URL` pointing at the v2 PostgreSQL database.
 - `TYPESAFE_API_KEY` and a pinned `CLOUD_SYS1_MODEL` for public literature.
-- `LOCAL_SYS1_API_KEY`, `LOCAL_SYS1_BASE_URL`, and a pinned `LOCAL_SYS1_MODEL` for identifiable ICSRs and hospital data.
-- `ANTHROPIC_API_KEY` and a pinned `ANTHROPIC_SYSTEM2_MODEL` for public-literature synthesis; a local `LOCAL_SYS2_BASE_URL` and `LOCAL_SYS2_MODEL` handle PHI-domain synthesis.
+- `LOCAL_SYS1_API_KEY`, `LOCAL_SYS1_BASE_URL`, and a pinned `LOCAL_SYS1_MODEL` for identifiable ICSRs.
+- `ANTHROPIC_API_KEY` and a pinned `ANTHROPIC_SYSTEM2_MODEL` for public-literature synthesis; a local `LOCAL_SYS2_BASE_URL` and `LOCAL_SYS2_MODEL` handle ICSR synthesis.
 - `SYS1_SAMPLER_VERSION` to record the exact sampler/runtime version.
 - `API_BEARER_TOKEN` for service-to-service endpoints and `REVIEWER_TOKENS_JSON` mapping reviewer tokens to `{ "id": "UUID", "role": "safety_physician" }` identities.
 - `NCBI_TOOL` and `NCBI_EMAIL` for PubMed; `NCBI_API_KEY` is optional.
 
-The local endpoint must implement the TypeSafe `system_one` request/response contract. A plain Ollama-compatible `/v1` endpoint is not sufficient evidence of compatibility. Contract-test it with synthetic data before sending PHI. `pv_literature` is the only domain routed to the hosted client; `pv_icsr` and `hospital_rcm` route locally.
+The local endpoint must implement the TypeSafe `system_one` request/response contract. A plain Ollama-compatible `/v1` endpoint is not sufficient evidence of compatibility. Contract-test it with synthetic data before sending PHI. `pv_literature` is the only domain routed to the hosted client; `pv_icsr` routes locally.
 
 Apply the additive v2 schemas to a fresh or deliberately prepared database in order:
 
@@ -66,7 +66,7 @@ vyom-api
 
 It binds to `127.0.0.1:8000` by default. Put it behind TLS and an approved network boundary before remote access. Service routes require `API_BEARER_TOKEN`; reviewer queue/action/report routes require a reviewer token from `REVIEWER_TOKENS_JSON`. This is a prototype token map, not enterprise SSO/RBAC.
 
-Implemented API routes: `GET /healthz`, `POST /v1/rcm/preflight`, `POST /v1/icsr/intake`, `POST /v1/literature/sweep`, `GET /v1/review/queue`, `POST /v1/review/states/{state_id}/actions`, `GET /v1/reports/gold/{gold_set_version}`, and `GET /v1/reports/screening-log`.
+Implemented API routes: `GET /healthz`, `POST /v1/icsr/intake`, `POST /v1/literature/sweep`, `GET /v1/review/queue`, `POST /v1/review/states/{state_id}/actions`, `GET /v1/reports/gold/{gold_set_version}`, and `GET /v1/reports/screening-log`.
 
 Import an independently adjudicated, frozen public-PV gold CSV with columns `state_id,is_valid_case,rationale_note`:
 
@@ -89,7 +89,7 @@ ENABLE_TRAINING_EXPORT=true TRAINING_EXPORT_DIR=./local-training-exports \
 	vyom-export-training --days 7
 ```
 
-The exporter includes only public PV pool corrections, excludes frozen gold states, and creates owner-only JSONL files. It never exports hospital RCM or identifiable ICSR states.
+The exporter includes only public PV pool corrections, excludes frozen gold states, and creates owner-only JSONL files. It never exports identifiable ICSR states.
 
 The sweep preserves raw source payloads, deduplicates canonical public states, records the state hash and model/schema/policy lineage, and skips decisions already recorded for the same pinned versions. It does not submit claims, generate regulatory outputs, or establish recall/calibration claims.
 

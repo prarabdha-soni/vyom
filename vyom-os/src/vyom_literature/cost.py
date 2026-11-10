@@ -29,7 +29,7 @@ UNAVAILABLE = None
 @dataclass(frozen=True)
 class CostEvent:
     tenant_id: str
-    item_type: str          # pv_literature | pv_icsr | hospital_rcm
+    item_type: str          # pv_literature | pv_icsr
     item_ref: str           # state id / decision id — never patient content
     provider: str           # vertex_ai | typesafe | local_ollama | anthropic
     model_id: str

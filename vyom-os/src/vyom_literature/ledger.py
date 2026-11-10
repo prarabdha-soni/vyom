@@ -6,11 +6,10 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DOMAINS = {"pv_literature", "pv_icsr", "hospital_rcm"}
+DOMAINS = {"pv_literature", "pv_icsr"}
 SOURCES = {
     "pubmed",
     "europepmc",
-    "hospital_his",
     "partner_e2b",
     "safety_email",
     "call_transcript",
@@ -56,7 +55,7 @@ def fail_closed_decision(router: Any, state_sha256: str, reason: str) -> dict[st
         "answers": {},
         "gate_probabilities": {},
         "p_valid_case": None,
-        "p_serious_or_denial": None,
+        "p_serious_event": None,
         "confidence_band": "YELLOW_REVIEW",
         "recommended_route": None,
         "outcome": "fail_closed",
@@ -180,7 +179,7 @@ def append_sys1_decision(connection: Any, *, state_id: int, decision: dict[str, 
                 insert into sys1_decisions (
                   state_id, model_id, sampler_version, question_schema_version,
                   threshold_policy_version, state_sha256, latency_ms, answers,
-                  p_valid_case, p_serious_or_denial, verbatim_extraction, confidence_band
+                  p_valid_case, p_serious_event, verbatim_extraction, confidence_band
                 )
                 select id, %s, %s, %s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s
                 from clinical_states
@@ -199,7 +198,7 @@ def append_sys1_decision(connection: Any, *, state_id: int, decision: dict[str, 
                     decision["latency_ms"],
                     json.dumps(decision["answers"], ensure_ascii=False),
                     decision.get("p_valid_case"),
-                    decision.get("p_serious_or_denial"),
+                    decision.get("p_serious_event"),
                     decision.get("verbatim_extraction"),
                     decision["confidence_band"],
                     state_id,

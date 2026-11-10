@@ -52,11 +52,11 @@ def test_public_literature_yellow_uses_cloud_and_validates_offsets():
     assert result.cited_passages == [{"quote": "patient developed rash", "start_char": 2, "end_char": 24}]
 
 
-def test_identifiable_rcm_red_uses_local_provider():
+def test_identifiable_icsr_red_uses_local_provider():
     router = _router()
     result = router.synthesize(
-        domain="hospital_rcm",
-        state={"source_text": "IV therapy started after admission."},
+        domain="pv_icsr",
+        state={"clinical_note": "IV therapy started after admission."},
         decision={"confidence_band": "RED_ESCALATE", "answers": {}},
     )
 

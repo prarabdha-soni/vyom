@@ -14,7 +14,7 @@ VALID_ACTIONS = {"ACCEPT", "CORRECT", "ESCALATE"}
 def fetch_review_queue(
     connection: Any, *, domain: str | None = None, limit: int = 50
 ) -> list[dict[str, Any]]:
-    if domain is not None and domain not in {"pv_literature", "pv_icsr", "hospital_rcm"}:
+    if domain is not None and domain not in {"pv_literature", "pv_icsr"}:
         raise ValueError("unsupported review domain")
     if not 1 <= limit <= 200:
         raise ValueError("limit must be between 1 and 200")
@@ -52,7 +52,6 @@ def fetch_review_queue(
             ) latest_label on true
             where (
               ld.confidence_band in ('YELLOW_REVIEW', 'RED_ESCALATE')
-              or (cs.domain = 'hospital_rcm' and ld.confidence_band = 'GREEN_PASS')
               or latest_label.action = 'ESCALATE'
             )
             and (latest_label.action is null or latest_label.action = 'ESCALATE')
@@ -61,7 +60,6 @@ def fetch_review_queue(
               (latest_label.action = 'ESCALATE') desc nulls last,
               (ld.confidence_band = 'RED_ESCALATE') desc,
               coalesce((ld.answers->'is_serious_event'->>'probability')::numeric, 0) desc,
-              coalesce((ld.answers->'tpa_denial_risk_score'->>'score')::int, 0) desc,
               cs.first_seen_at asc
             limit %s
             """,

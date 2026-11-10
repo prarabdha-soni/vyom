@@ -32,14 +32,6 @@ from vyom_literature.system_two import SystemTwoRouter
 MAX_STATE_BYTES = 1_000_000
 
 
-class HospitalPreflightRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    admission_uid: str = Field(min_length=1, max_length=128)
-    payer_code: str = Field(min_length=1, max_length=64)
-    normalized_state: dict[str, Any]
-
-
 class IcsrIntakeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -76,10 +68,6 @@ def _validate_state_size(state: dict[str, Any]) -> None:
         raise HTTPException(status_code=413, detail="Normalized state exceeds the configured size limit")
 
 
-def _review_safe_id(admission_uid: str, state_hash: str) -> str:
-    return hashlib.sha256(f"{admission_uid}:{state_hash}".encode("utf-8")).hexdigest()
-
-
 def create_app(
     *,
     router: SystemOneRouter,
@@ -88,7 +76,6 @@ def create_app(
     reviewer_tokens: dict[str, ReviewerIdentity] | None = None,
     literature_runner: Callable[[date, date], list[dict[str, Any]]] | None = None,
     system_two_router: SystemTwoRouter | None = None,
-    hospital_rcm_enabled: bool = False,
 ) -> FastAPI:
     if not api_token:
         raise ValueError("An API bearer token is required")
@@ -114,88 +101,6 @@ def create_app(
     @app.get("/healthz")
     def health() -> dict[str, str]:
         return {"status": "ok"}
-
-    def rcm_preflight(request: HospitalPreflightRequest) -> dict[str, Any]:
-        normalized_state = {**request.normalized_state, "domain": "hospital_rcm"}
-        _validate_state_size(normalized_state)
-
-        try:
-            decision = router.evaluate("hospital_rcm", normalized_state)
-        except Exception as error:
-            raise HTTPException(status_code=502, detail="Local System One evaluation failed") from error
-
-        if decision.get("state_sha256") is None:
-            raise HTTPException(status_code=502, detail="System One response did not include state lineage")
-
-        state_hash = decision["state_sha256"]
-        safe_id = _review_safe_id(request.admission_uid, state_hash)
-        dedup_key = f"hospital_admission:{safe_id}"
-        source_uid = f"hospital_his:{safe_id}"
-        synthesis = None
-
-        try:
-            with connection_factory() as connection:
-                state_write = record_state_and_source(
-                    connection,
-                    domain="hospital_rcm",
-                    dedup_key=dedup_key,
-                    title_or_header="Hospital admission preflight",
-                    normalized_state=normalized_state,
-                    source="hospital_his",
-                    source_uid=source_uid,
-                    raw_payload=normalized_state,
-                )
-                if state_write.state_sha256 != decision["state_sha256"]:
-                    raise HTTPException(status_code=409, detail="Stored state hash differs from evaluated state")
-                decision_id = append_sys1_decision(
-                    connection, state_id=state_write.state_id, decision=decision
-                )
-                if system_two_router is not None:
-                    synthesis = get_sys2_synthesis(connection, decision_id=decision_id)
-        except HTTPException:
-            raise
-        except Exception as error:
-            raise HTTPException(status_code=503, detail="Decision ledger write failed") from error
-
-        if system_two_router is not None and synthesis is None:
-            try:
-                generated = system_two_router.synthesize(
-                    domain="hospital_rcm",
-                    state=state_write.normalized_state,
-                    decision=decision,
-                )
-                if generated is not None:
-                    with connection_factory() as synthesis_connection:
-                        append_sys2_synthesis(
-                            synthesis_connection,
-                            decision_id=decision_id,
-                            synthesis=generated,
-                        )
-                    synthesis = {
-                        "model_id": generated.model_id,
-                        "draft_narrative": generated.draft_narrative,
-                        "cited_passages": generated.cited_passages,
-                    }
-            except Exception as error:
-                raise HTTPException(
-                    status_code=502,
-                    detail="System One decision was recorded, but System Two synthesis failed",
-                ) from error
-
-        return {
-            "state_id": state_write.state_id,
-            "decision_id": decision_id,
-            "payer_code": request.payer_code,
-            "confidence_band": decision["confidence_band"],
-            "latency_ms": decision["latency_ms"],
-            "gate_probabilities": decision["gate_probabilities"],
-            "recommended_route": decision["recommended_route"],
-            "requires_human_release": True,
-            "synthesis": synthesis,
-        }
-
-    if hospital_rcm_enabled:
-        app.post("/v1/rcm/preflight", dependencies=[Depends(require_token)])(rcm_preflight)
 
     @app.post("/v1/icsr/intake", dependencies=[Depends(require_token)])
     def icsr_intake(request: IcsrIntakeRequest) -> dict[str, Any]:
@@ -416,6 +321,4 @@ def create_app_from_env() -> FastAPI:
         reviewer_tokens=reviewer_tokens,
         literature_runner=literature_runner,
         system_two_router=system_two_router,
-        hospital_rcm_enabled=os.environ.get("ENABLE_HOSPITAL_RCM", "").strip().lower()
-        in {"1", "true", "yes", "on"},
     )

@@ -75,7 +75,7 @@ def build_evidence_pack(connection: Any, *, state_id: int) -> dict[str, Any]:
             """
             select id, model_id, sampler_version, question_schema_version,
                    threshold_policy_version, state_sha256, latency_ms, answers,
-                   p_valid_case, p_serious_or_denial, verbatim_extraction,
+                   p_valid_case, p_serious_event, verbatim_extraction,
                    confidence_band, created_at
             from sys1_decisions where state_id = %s order by created_at, id
             """,
