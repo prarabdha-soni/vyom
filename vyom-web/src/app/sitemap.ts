@@ -12,6 +12,7 @@ const routes = [
   ...products.map((product) => `/products/${product.slug}`),
   '/platform',
   '/intelligence',
+  '/benchmark',
   '/intelligence/alerts',
   ...records.map((record) => `/intelligence/cases/${record.slug}`),
   '/pricing',

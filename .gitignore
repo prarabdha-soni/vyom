@@ -5,4 +5,3 @@ __pycache__/
 /vyom-web/node_modules/
 /vyom-web/.next/
 /vyom-web/tsconfig.tsbuildinfo
-/vyombench/

@@ -14,6 +14,7 @@ export const primaryNav: readonly NavLink[] = [
   { label: 'Products', href: '/products' },
   { label: 'Platform', href: '/platform' },
   { label: 'Safety Intelligence', href: '/intelligence' },
+  { label: 'VyomBench', href: '/benchmark' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'How we start', href: '/how-we-start' },
   { label: 'Company', href: '/company' },
