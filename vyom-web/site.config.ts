@@ -42,7 +42,7 @@ export const siteConfig = {
    * robots.txt disallows everything. Flip to true only when the site is ready
    * to be found.
    */
-  indexable: false,
+  indexable: true,
 
   /** Placeholders — replace the bracketed values. */
   email: '[YOUR EMAIL]',
