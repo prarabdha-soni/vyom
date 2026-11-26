@@ -12,7 +12,6 @@ dependencies = [
 	"psycopg[binary]>=3.2,<4",
 	"python-dotenv>=1,<2",
 	"uvicorn[standard]>=0.30,<1",
-	"typesafe-sdk>=0.1.0,<1",
 ]
 
 [project.scripts]
@@ -22,12 +21,21 @@ vyom-api = "vyom_literature.server:main"
 vyom-gold-import = "vyom_literature.gold_import:main"
 vyom-report = "vyom_literature.weekly_report:main"
 vyom-export-training = "vyom_literature.training_export:main"
+vyom-os-api = "vyom_os.server:main"
+vyom-seed-demo = "vyom_os.seed:main"
+vyom-weekly-sweep = "vyom_os.worker:main"
+vyom-terminology-load = "vyom_os.terminology:main"
 
 [project.optional-dependencies]
 test = ["httpx>=0.27,<1", "pytest>=8,<9"]
+# Legacy System One client. The Vertex AI (Gemini) path needs no SDK.
+typesafe = ["typesafe-sdk>=0.1.0,<1"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+vyom_os = ["fixtures/*.json"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

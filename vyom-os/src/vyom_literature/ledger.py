@@ -14,7 +14,14 @@ SOURCES = {
     "safety_email",
     "call_transcript",
     "hospital_adr_form",
+    "demo_fixture",
+    "manual_entry",
 }
+
+
+# Rows belong to the transaction tenant (migration 009). Service connections
+# without a tenant fall back to the bootstrap tenant, as before tenancy.
+_TENANT_SCOPE = "coalesce(app_tenant_id(), '00000000-0000-0000-0000-000000000001'::uuid)"
 
 
 class LedgerConflictError(ValueError):
@@ -92,7 +99,7 @@ def record_state_and_source(
                 insert into clinical_states
                   (domain, dedup_key, title_or_header, normalized_state, state_sha256)
                 values (%s, %s, %s, %s::jsonb, %s)
-                on conflict (domain, dedup_key) do nothing
+                on conflict (tenant_id, domain, dedup_key) do nothing
                                 returning id, state_sha256, normalized_state
                 """,
                 (
@@ -107,7 +114,8 @@ def record_state_and_source(
             state_created = state_row is not None
             if state_row is None:
                 cursor.execute(
-                    "select id, state_sha256, normalized_state from clinical_states where domain = %s and dedup_key = %s",
+                    "select id, state_sha256, normalized_state from clinical_states where domain = %s and dedup_key = %s"
+                    f" and tenant_id = {_TENANT_SCOPE}",
                     (domain, dedup_key),
                 )
                 state_row = cursor.fetchone()
@@ -119,7 +127,7 @@ def record_state_and_source(
                 """
                 insert into source_records (source, source_uid, strategy_id, state_id, raw_payload)
                 values (%s, %s, %s, %s, %s::jsonb)
-                on conflict (source, source_uid) do nothing
+                on conflict (tenant_id, source, source_uid) do nothing
                 returning id
                 """,
                 (source, source_uid, strategy_id, state_id, raw_json),
@@ -127,7 +135,8 @@ def record_state_and_source(
             source_created = cursor.fetchone() is not None
             if not source_created:
                 cursor.execute(
-                    "select state_id from source_records where source = %s and source_uid = %s",
+                    "select state_id from source_records where source = %s and source_uid = %s"
+                    f" and tenant_id = {_TENANT_SCOPE}",
                     (source, source_uid),
                 )
                 source_row = cursor.fetchone()
