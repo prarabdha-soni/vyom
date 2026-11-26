@@ -26,6 +26,16 @@ def get_product(connection: Any, code: str) -> dict[str, Any]:
     return row
 
 
+def product_label(product: dict[str, Any]) -> str:
+    """`CODE (Name)`, or just the name when it already carries the code."""
+    code, name = str(product.get("code") or ""), str(product.get("name") or "")
+    if not name or name == code:
+        return code
+    if code and name.startswith(code):
+        return name
+    return f"{code} ({name})" if code else name
+
+
 def catalogue(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """What a model is told about the tenant's products."""
     return [

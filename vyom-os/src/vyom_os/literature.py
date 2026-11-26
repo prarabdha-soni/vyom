@@ -367,6 +367,8 @@ def detail(connection: Any, ctx: Ctx, state_id: int) -> dict[str, Any]:
         for key, question in PV_LITERATURE_QUESTIONS.items()
     ]
     final = next((o for o in outcomes if o["outcome"] in FINAL_OUTCOMES), None)
+    # Once escalated, only a safety physician (or above) may close the article; see decide().
+    awaiting_physician = final is None and bool(outcomes) and outcomes[0]["outcome"] == "escalated"
     return {
         "state_id": row["state_id"],
         "reference": _reference(row["source"], row["source_uid"], state),
@@ -396,7 +398,8 @@ def detail(connection: Any, ctx: Ctx, state_id: int) -> dict[str, Any]:
         "is_ai": bool(latest) and latest["model_id"] != demo.DEMO_MODEL_ID,
         "outcomes": outcomes,
         "final_outcome": final,
-        "can_decide": ctx.can("literature.screen") and final is None,
+        "awaiting_physician": awaiting_physician,
+        "can_decide": ctx.can("literature.screen") and final is None and not (awaiting_physician and ctx.actor.role == "reviewer"),
         "history": audit.history(connection, entity_kind="literature", entity_ref=str(state_id)),
     }
 

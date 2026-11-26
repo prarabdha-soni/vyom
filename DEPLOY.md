@@ -58,8 +58,16 @@ While it is empty, `submitBenchmarkRequest()` in `vyom-web/src/lib/api.ts` build
    backend lands, set it to the API's base URL (no trailing slash) and that one function
    starts POSTing to `${NEXT_PUBLIC_API_URL}/benchmark-requests` instead.
 
-   Add `NEXT_PUBLIC_VYOM_OS_URL` when the FastAPI service in `vyom-os` is reachable
-   (used by `vyom-web/src/lib/gateway/api-client.ts`).
+   The console needs two **server-only** variables once Vyom OS is reachable
+   (mark them *Sensitive* in Vercel):
+
+   | Name | Value |
+   | --- | --- |
+   | `VYOM_OS_URL` | Vyom OS base URL, no trailing slash |
+   | `VYOM_SESSION_SECRET` | the same value Vyom OS uses, at least 32 characters |
+
+   Without them, sign-in is off and `/login` offers only the sample workspace
+   (`sampleWorkspace` in `site.config.ts`), which needs no backend.
 
 `NEXT_PUBLIC_` variables are inlined into the client bundle at build time, so
 they are public by definition. Never put a secret behind this prefix, and

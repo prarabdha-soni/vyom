@@ -65,18 +65,41 @@ src/
       pricing/                  /pricing
       book-demo/                /book-demo
       products/[slug]/          existing product pages
-    (auth)/login/               /login
-    (platform)/[tenant_slug]/   Auth + TenantProvider
-      dashboard/ console/ settings/
-    (internal)/ops/             /ops
+    (auth)/login/               /login (sign-in + sample workspace picker)
+    (platform)/[tenant_slug]/   Console shell (icon rail, top bar)
+      dashboard/                KPIs, pipeline, activity
+      radar/ radar/[stateId]/   Literature screening (module: Vyom Radar)
+      verify/ verify/new/ verify/[caseNumber]/
+                                Case processing + E2B (module: Vyom Verify)
+      dossier/ dossier/[reportNumber]/
+                                PBRER / PADER authoring + sign-off (Vyom Dossier)
+      audit/ settings/
+    (internal)/ops/             /ops (ops role only)
   components/
+    console/                    Console UI: ui.tsx kit, forms.tsx, ShellClient,
+                                radar/ verify/ dossier/ client controls
   content/                      All copy lives here
+    console.ts                  All console copy and labels
+    sample-workspace/           snapshot.json + README (fictional demo-pharma data)
   lib/
     api.ts                      Marketing form boundary
-    gateway/api-client.ts       JWT + X-Tenant-ID → vyom-os
-    tenant/TenantContext.tsx
+    auth/                       session cookie, token verify, server actions, roles
+    console/                    data.ts loaders, actions.ts mutations, sample.ts
+    gateway/api-client.ts       JWT + X-Tenant-ID → vyom-os (server-only)
+    gateway/types.ts            Vyom OS API types
 site.config.ts
 ```
+
+### Console
+
+- Every console page loads through `lib/console/data.ts`, which serves either
+  Vyom OS (live session) or the sample snapshot (`vyom_session=sample:<role>`).
+  Mutations in `lib/console/actions.ts` never send anything in sample mode.
+- The sample snapshot's dates are shifted to today on load. Regenerate it from a
+  seeded Vyom OS (see `content/sample-workspace/README.md`) rather than editing
+  numbers by hand.
+- `VYOM_OS_URL` and `VYOM_SESSION_SECRET` are server-only; never expose them as
+  `NEXT_PUBLIC_`.
 
 ## Content rules — non-negotiable
 

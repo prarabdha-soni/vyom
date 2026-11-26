@@ -44,6 +44,13 @@ export const siteConfig = {
    */
   indexable: true,
 
+  /**
+   * Offers the sample workspace on /login: the fictional tenant demo-pharma,
+   * browsable without a backend. Its data is SAMPLE DATA and changes made
+   * there are not saved.
+   */
+  sampleWorkspace: true,
+
   /** Placeholders — replace the bracketed values. */
   email: '[YOUR EMAIL]',
   location: 'Gurugram, India',

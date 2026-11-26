@@ -402,3 +402,83 @@ export const trustIcons = {
   lock: LockIcon,
   shield: ShieldIcon,
 } as const;
+
+// ---------------------------------------------------------------------------
+// Console
+// ---------------------------------------------------------------------------
+
+export function GridIcon({ size = 20, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    </Icon>
+  );
+}
+
+export function HistoryIcon({ size = 20, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
+      <path d="M4.5 4.5v3.6h3.6" />
+      <path d="M12 8v4.2l2.8 1.7" />
+    </Icon>
+  );
+}
+
+export function SignOutIcon({ size = 18, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
+      <path d="M14 8l4 4-4 4" />
+      <path d="M18 12H9.5" />
+    </Icon>
+  );
+}
+
+export function ChevronLeftIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Icon size={size} strokeWidth={2} {...props}>
+      <path d="M14.5 6l-6 6 6 6" />
+    </Icon>
+  );
+}
+
+export function ChevronRightIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Icon size={size} strokeWidth={2} {...props}>
+      <path d="M9.5 6l6 6-6 6" />
+    </Icon>
+  );
+}
+
+export function DownloadIcon({ size = 18, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M12 4.5v10" />
+      <path d="M7.5 10.5l4.5 4.5 4.5-4.5" />
+      <path d="M5 19.5h14" />
+    </Icon>
+  );
+}
+
+export function AlertIcon({ size = 18, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M12 4.5l8.5 15h-17L12 4.5z" />
+      <path d="M12 10v4" />
+      <path d="M12 16.8v.2" />
+    </Icon>
+  );
+}
+
+export function QuoteIcon({ size = 16, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M5 17.5c2.5-1 3.5-3 3.5-5.5H5V6.5h5.5V12c0 3.5-1.7 6-5.5 7.5" />
+      <path d="M13.5 17.5c2.5-1 3.5-3 3.5-5.5h-3.5V6.5H19V12c0 3.5-1.7 6-5.5 7.5" />
+    </Icon>
+  );
+}

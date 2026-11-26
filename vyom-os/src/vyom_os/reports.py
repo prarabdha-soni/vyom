@@ -22,7 +22,7 @@ from vyom_os.ai.tasks import _NUMBER, REPORT_SECTION, AiOutputError, parse_repor
 from vyom_os.cases import next_number
 from vyom_os.core import Conflict, Ctx, InvalidInput, NotFound
 from vyom_os.db import Jsonb, fetch_all, fetch_one, fetch_value
-from vyom_os.products import get_product
+from vyom_os.products import get_product, product_label
 
 REPORT_SCHEMA = "vyom.report.v1"
 REPORT_TYPES = ("pbrer", "pader")
@@ -587,7 +587,7 @@ def to_markdown(view: dict[str, Any]) -> str:
     report, content = view["report"], view["content"]
     title = "Periodic benefit-risk evaluation report" if report["report_type"] == "pbrer" else "Periodic adverse drug experience report"
     lines = [
-        f"# {title}: {content['product']['code']} ({content['product']['name']})",
+        f"# {title}: {product_label(content['product'])}",
         "",
         f"- Report: {report['report_number']}, version {view['version']}",
         f"- Interval: {content['interval']['start']} to {content['interval']['data_lock_point']} (data lock point)",

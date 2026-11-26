@@ -547,6 +547,17 @@ def _join(items: list[str]) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
+def _count(number: int, noun: str, plural: str | None = None) -> str:
+    return f"{number} {noun if number == 1 else (plural or noun + 's')}"
+
+
+def _product_label(product: dict[str, Any]) -> str:
+    code, name = str(product.get("code") or ""), str(product.get("name") or "")
+    if not name or name == code or (code and name.startswith(code)):
+        return name or code
+    return f"{code} ({name})" if code else name
+
+
 def narrative(payload: dict[str, Any]) -> dict[str, Any]:
     case = payload.get("case_data", {})
     patient = case.get("patient", {})
@@ -614,7 +625,7 @@ def report_section(payload: dict[str, Any]) -> dict[str, Any]:
     cases = [str(number) for number in data.get("case_numbers", [])]
     if key in {"introduction"}:
         text = (
-            f"This periodic report covers {product.get('code')} ({product.get('name')}) for the reporting interval "
+            f"This periodic report covers {_product_label(product)} for the reporting interval "
             f"{interval}, which ends at the data lock point. It summarises individual case safety reports that were "
             "medically reviewed and approved in the interval, and the literature screened by the safety team. "
             "Sections marked as requiring input need information from the marketing authorisation holder."
@@ -622,13 +633,19 @@ def report_section(payload: dict[str, Any]) -> dict[str, Any]:
         return {"text": text, "citations": []}
     if key in {"summary_tabulations", "pader_narrative"}:
         top = data.get("top_events", [])
-        top_text = _join([f"{row['term']} ({row['interval']})" for row in top[:3]]) or "none"
+        top_text = _join([f"{row['term']} ({row['interval']})" for row in top[:3]])
         expedited = data.get("expedited_cases", [])
+        included = int(stats.get("interval_cases", 0))
+        cumulative = int(stats.get("cumulative_cases", 0))
         text = (
-            f"During the interval {interval}, {stats.get('interval_cases', 0)} cases were included: "
+            f"During the interval {interval}, {_count(included, 'case')} {'was' if included == 1 else 'were'} included: "
             f"{stats.get('interval_serious', 0)} serious and {stats.get('interval_non_serious', 0)} non-serious. "
-            f"Cumulatively, {stats.get('cumulative_cases', 0)} cases have been included up to the data lock point. "
-            f"The most frequently reported events in the interval were {top_text}."
+            f"Cumulatively, {_count(cumulative, 'case')} {'has' if cumulative == 1 else 'have'} been included up to the data lock point. "
+            + (
+                f"The most frequently reported events in the interval were {top_text}."
+                if top_text
+                else "No events were reported in the interval."
+            )
         )
         if expedited:
             text += (
@@ -636,13 +653,17 @@ def report_section(payload: dict[str, Any]) -> dict[str, Any]:
                 "The safety physician should confirm whether each was submitted within the expedited timeline."
             )
         if stats.get("pending_cases"):
-            text += f" A further {stats['pending_cases']} cases received in the interval were still in processing and are not included."
+            pending = int(stats["pending_cases"])
+            text += (
+                f" A further {_count(pending, 'case')} received in the interval {'was' if pending == 1 else 'were'} "
+                "still in processing and not included."
+            )
         return {"text": text, "citations": sorted(set(cases + expedited))}
     if key == "literature":
         valid = data.get("literature_valid", [])
         info = data.get("literature_information", [])
         text = (
-            f"The safety team screened {stats.get('literature_screened', 0)} articles in the interval. "
+            f"The safety team screened {_count(int(stats.get('literature_screened', 0)), 'article')} in the interval. "
             f"{len(valid)} contained a valid individual case"
             + (f" ({_join(valid)})" if valid else "")
             + f" and {len(info)} contained other safety information"

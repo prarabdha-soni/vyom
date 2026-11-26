@@ -205,6 +205,32 @@ def test_literature_decision_opens_a_case_and_sweeps_are_idempotent(env):
     assert sweep["screened"] == 0 and sweep["already_screened"] == 12
 
 
+def test_escalated_articles_wait_for_a_physician(env):
+    client = env["client"]
+    reviewer = _sign_in(env, "reviewer@demo-pharma.example")
+    physician = _sign_in(env, "physician@demo-pharma.example")
+    queue = client.get("/v1/literature?view=open", headers=reviewer).json()["items"]
+    open_items = [item for item in queue if item["reference"] != "VY-LIT-0011" and item.get("outcome") is None]
+    article = next((item for item in open_items if item["band"] == "RED_ESCALATE"), open_items[0])
+    url = f"/v1/literature/{article['state_id']}/decision"
+
+    def decide(headers, outcome, reason=None):
+        return client.post(url, headers=headers, json={"decision_id": article["decision_id"], "outcome": outcome, "reason": reason})
+
+    assert decide(reviewer, "escalated").status_code == 422  # escalating needs a reason
+    assert decide(reviewer, "escalated", "Possible hepatotoxicity signal").status_code == 200
+    seen_by_reviewer = client.get(f"/v1/literature/{article['state_id']}", headers=reviewer).json()
+    assert seen_by_reviewer["awaiting_physician"] is True and seen_by_reviewer["can_decide"] is False
+    assert decide(reviewer, "safety_information").status_code == 403
+    assert client.get(f"/v1/literature/{article['state_id']}", headers=physician).json()["can_decide"] is True
+    if article["band"] == "RED_ESCALATE":
+        assert decide(physician, "not_relevant").status_code == 422  # closing an urgent article needs a reason
+    closed = decide(physician, "not_relevant", "Concerns an unrelated product.")
+    assert closed.status_code == 200, closed.text
+    final = client.get(f"/v1/literature/{article['state_id']}", headers=reviewer).json()
+    assert final["final_outcome"]["outcome"] == "not_relevant" and final["awaiting_physician"] is False
+
+
 def test_case_workflow_roles_and_export(env):
     client = env["client"]
     reviewer = _sign_in(env, "reviewer@demo-pharma.example")
