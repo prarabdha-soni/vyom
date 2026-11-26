@@ -20,14 +20,14 @@ export function HowWeStart() {
               key={stage.number}
               className={cn(
                 'flex min-w-0 flex-[1_1_300px] flex-col gap-3.5 rounded-panel border bg-surface p-7',
-                stage.tone === 'accent' ? 'border-accent-line' : 'border-line',
+                stage.tone === 'accent' ? 'border-strong' : 'border-line',
               )}
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span
                   className={cn(
                     'text-[44px] leading-none font-semibold tracking-[-0.03em]',
-                    stage.tone === 'accent' ? 'text-accent' : 'text-primary',
+                    'text-primary',
                   )}
                 >
                   {stage.number}

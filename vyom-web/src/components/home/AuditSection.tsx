@@ -22,7 +22,7 @@ export function AuditSection() {
                 key={bullet}
                 className="flex items-start gap-3 text-[16px] leading-[1.5] text-secondary"
               >
-                <span className="mt-0.5 flex shrink-0 text-accent">
+                <span className="mt-0.5 flex shrink-0 text-green">
                   <CheckIcon />
                 </span>
                 <span>{bullet}</span>

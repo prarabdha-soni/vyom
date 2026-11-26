@@ -38,7 +38,7 @@ export default function HowWeStartPage() {
                 data-reveal
                 className={cn(
                   'flex flex-wrap gap-x-16 gap-y-8 rounded-panel border bg-surface p-7 sm:p-10',
-                  stage.tone === 'accent' ? 'border-accent-line' : 'border-line',
+                  stage.tone === 'accent' ? 'border-strong' : 'border-line',
                 )}
               >
                 <div className="flex min-w-0 flex-[1_1_320px] flex-col gap-4">
@@ -46,7 +46,7 @@ export default function HowWeStartPage() {
                     <span
                       className={cn(
                         'text-[44px] leading-none font-semibold tracking-[-0.03em]',
-                        stage.tone === 'accent' ? 'text-accent' : 'text-primary',
+                        'text-primary',
                       )}
                     >
                       {stage.number}
@@ -85,7 +85,7 @@ export default function HowWeStartPage() {
                           key={item}
                           className="flex items-start gap-3 text-[15.5px] leading-[1.5] text-secondary"
                         >
-                          <span className="mt-0.5 flex shrink-0 text-accent">
+                          <span className="mt-0.5 flex shrink-0 text-green">
                             <CheckIcon />
                           </span>
                           <span>{item}</span>
@@ -116,7 +116,7 @@ export default function HowWeStartPage() {
                     {item.question}
                     <span
                       aria-hidden="true"
-                      className="flex size-6 shrink-0 items-center justify-center text-accent transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none"
+                      className="flex size-6 shrink-0 items-center justify-center text-primary transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none"
                     >
                       <PlusIcon />
                     </span>

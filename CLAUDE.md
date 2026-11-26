@@ -17,9 +17,10 @@ A later backend change for the marketing form should need to touch **only**
 `vyom-web/src/lib/api.ts`. Tenant-app calls to FastAPI go through
 `vyom-web/src/lib/gateway/api-client.ts`.
 
-The design file `design/Vyom Home Screen.html` is the source of truth for the
-look; the build brief is the source of truth for content, structure and rules.
-If the two conflict, ask.
+The design file `design/Vyom Home Screen.html` is the source of truth for
+layout; since 2026-11-27 its colours are superseded by the light palette in
+`DESIGN.md`. The build brief is the source of truth for content, structure and
+rules. If they conflict, ask.
 
 ## Stack — vyom-web
 
@@ -89,7 +90,8 @@ site.config.ts
    A number that is none of these does not belong on the site.
 3. **Sample screens use only fictional identifiers**: drug codes `VY-201`, `VY-305`,
    `VY-412`, case ids `VY-CASE-xxxx`, and `Vendor A`. Vendor A is marked `(FICTIONAL)`.
-   Sample tenants are `demo-hospital` and `demo-tpa`, marked `(FICTIONAL)`.
+   The sample tenant is `demo-pharma`, marked `(FICTIONAL)` (agreed 2026-11-27;
+   `demo-hospital` and `demo-tpa` are retired), with users at `@demo-pharma.example`.
    **Exception (agreed 2026-10-27):** `/intelligence` shows real public-source
    incidents. Every statement there cites a source that was actually read, the
    content carries a `PUBLIC SOURCE` chip, and a company is named only as the
@@ -99,11 +101,13 @@ site.config.ts
 5. **The Concept preview notice bar** is controlled by one flag in `site.config.ts`
    (`showNotice`).
 6. **All copy lives in typed content files** under `src/content/`. Components render
-   content; they never hold it. `products.ts` has a `flagship` setting, default `"cases"`.
+   content; they never hold it. `products.ts` lists the three modules — Vyom Radar,
+   Vyom Verify, Vyom Dossier — and has a `flagship` setting, default `"verify"`.
 7. **Placeholders stay visibly marked** — `[YOUR EMAIL]` and friends live in
    `site.config.ts` and keep their brackets until the owner replaces them.
 8. Blue accent means **AI activity**. Amber means **a human or physician decision**.
-   Never mix them.
+   Never mix them. Green means **verified or complete**; rose means **locked or
+   overdue**. Output of the rule-based demo engine is not AI and is never blue.
 9. **Indian English** spelling, as in the design: "hospitalised", "signal",
    "programme" where it occurs.
 

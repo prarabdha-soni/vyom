@@ -2,44 +2,77 @@
 
 /* ---------------------------------------------------------------------------
    Design tokens. Defined once here; everything else refers to them.
-   Change --color-accent and the whole site follows.
+
+   Light theme (agreed 2026-11-27): white surfaces, near-black text, soft sky
+   wash behind heroes. Colour carries meaning, never decoration:
+     blue  (accent) = AI did this
+     amber          = a human or physician decision
+     green          = verified, complete, sealed
+     rose           = locked or overdue
    --------------------------------------------------------------------------- */
 
 @theme {
   /* Surfaces */
-  --color-page: #070b14;
-  --color-alt: #0a0f1c;
-  --color-surface: #0d1324;
-  --color-raised: #111a2e;
-  --color-panel: #0b1120;
-  --color-panel-header: #0e1526;
+  --color-page: #fcfcfd;
+  --color-alt: #f5f6f9;
+  --color-surface: #ffffff;
+  --color-raised: #f3f4f7;
+  --color-panel: #ffffff;
+  --color-panel-header: #f8f9fb;
 
   /* Borders. Named so they never collide with Tailwind's border-style
      utilities (border-dashed, border-solid) or with a surface token. */
-  --color-hairline: #141c30;
-  --color-line: #1d2842;
-  --color-strong: #263355;
-  --color-button: #2b3a5c;
-  --color-dash: #3a4a70;
+  --color-hairline: #eceef3;
+  --color-line: #e3e6ed;
+  --color-strong: #d6dae3;
+  --color-button: #d0d5df;
+  --color-dash: #aab1c0;
 
-  /* Text */
-  --color-primary: #eaf0fa;
-  --color-secondary: #c9d2e3;
-  --color-muted: #a7b2c6;
-  --color-meta: #8290a8;
+  /* Text. Every value clears 4.5:1 on page, alt and surface. */
+  --color-primary: #0c0d12;
+  --color-secondary: #2a2e38;
+  --color-muted: #535968;
+  --color-meta: #646a79;
 
-  /* Accent — AI activity. Change this one value and the site follows.
-     Alternatives: #4cc3b5, #9c93f2 */
-  --color-accent: #62aef2;
-  --color-accent-tint: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  --color-accent-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
-  --color-on-accent: #06101f;
+  /* Accent — AI activity. */
+  --color-accent: #2563eb;
+  --color-accent-tint: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --color-on-accent: #ffffff;
 
   /* Amber — a human or physician decision. Never used for AI. */
-  --color-amber: #f2b866;
-  --color-amber-line: #5a4321;
-  --color-amber-soft: #241a0c;
-  --color-amber-highlight: #2a1e0d;
+  --color-amber: #b45309;
+  --color-amber-line: #efd09a;
+  --color-amber-soft: #fdf6e8;
+  --color-amber-highlight: #fcefd4;
+
+  /* Green — verified, complete, sealed. */
+  --color-green: #15803d;
+  --color-green-fill: #22a559;
+  --color-green-line: #b9e3c7;
+  --color-green-soft: #edf8f1;
+
+  /* Rose — locked or overdue. */
+  --color-rose: #c62d42;
+  --color-rose-line: #f2c2c9;
+  --color-rose-soft: #fdf0f2;
+
+  /* Ink — primary actions inside the product. */
+  --color-ink: #0c0d12;
+  --color-on-ink: #ffffff;
+
+  /* Call to action — marketing buttons only. */
+  --color-cta: #f7c948;
+  --color-cta-hover: #f1bb22;
+  --color-on-cta: #17130a;
+
+  /* Neutral highlight for rule-based (non-AI) text matches. */
+  --color-mark: #eceff5;
+
+  /* Sky wash behind heroes. */
+  --color-wash-lavender: #e9e6fc;
+  --color-wash-peach: #fdeadb;
+  --color-wash-sky: #e2edfc;
 
   /* Type */
   --font-sans: var(--font-instrument-sans), 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -53,8 +86,10 @@
   --radius-card: 14px;
   --radius-panel: 16px;
 
-  /* The two mock panels, and nothing else, carry a shadow. */
-  --shadow-panel: 0 48px 96px -48px rgba(0, 0, 0, 0.9);
+  /* Soft shadows: product frames and mock panels, menus, raised tabs. */
+  --shadow-panel: 0 24px 56px -28px rgba(17, 24, 39, 0.22), 0 2px 6px rgba(17, 24, 39, 0.04);
+  --shadow-pop: 0 18px 44px -14px rgba(17, 24, 39, 0.2), 0 2px 6px rgba(17, 24, 39, 0.05);
+  --shadow-tab: 0 1px 2px rgba(17, 24, 39, 0.08), 0 1px 1px rgba(17, 24, 39, 0.04);
 }
 
 /* ---------------------------------------------------------------------------

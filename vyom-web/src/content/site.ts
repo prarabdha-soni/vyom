@@ -10,15 +10,25 @@ export const notice = {
   text: 'Product screens show sample data, except Safety Intelligence, which shows public-source records. Figures marked as targets are goals we will prove in pilots.',
 } as const;
 
+/** Links beside the Platform menu, which lists the modules itself. */
 export const primaryNav: readonly NavLink[] = [
-  { label: 'Products', href: '/products' },
-  { label: 'Platform', href: '/platform' },
   { label: 'Safety Intelligence', href: '/intelligence' },
   { label: 'VyomBench', href: '/benchmark' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'How we start', href: '/how-we-start' },
   { label: 'Company', href: '/company' },
 ];
+
+/** The Platform mega-menu: the three modules plus these links underneath. */
+export const platformMenu = {
+  label: 'Platform',
+  heading: 'PLATFORM',
+  footer: [
+    { label: 'How the platform works', href: '/platform' },
+    { label: 'Compare the modules', href: '/products' },
+    { label: 'Open the sample workspace', href: '/login' },
+  ],
+} as const satisfies { label: string; heading: string; footer: readonly NavLink[] };
 
 export const headerActions = {
   secondary: { label: 'Sign in', href: '/login' },
@@ -29,14 +39,13 @@ export const footer = {
   tagline: 'AI-native drug safety, built in India for the world.',
   columns: [
     {
-      title: 'PRODUCTS',
+      title: 'MODULES',
       links: [
-        { label: 'Vyom Cases', href: '/products/cases' },
-        { label: 'Vyom Literature', href: '/products/literature' },
-        { label: 'Vyom Audit', href: '/products/audit' },
-        { label: 'Vyom Reports', href: '/products/reports' },
-        { label: 'Vyom Signal', href: '/products/signal' },
-        { label: 'Vyom OS', href: '/products/os' },
+        { label: 'Vyom Radar', href: '/products/radar' },
+        { label: 'Vyom Verify', href: '/products/verify' },
+        { label: 'Vyom Dossier', href: '/products/dossier' },
+        { label: 'Compare the modules', href: '/products' },
+        { label: 'Sample workspace', href: '/login' },
       ],
     },
     {

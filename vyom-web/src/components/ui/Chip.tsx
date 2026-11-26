@@ -1,13 +1,21 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 
-export type ChipTone = 'default' | 'accent' | 'amber' | 'dashed';
+/**
+ * Tone carries meaning: accent = AI, amber = a human decision, green =
+ * verified or complete, rose = locked or overdue, muted = a neutral state
+ * such as Draft, dashed = SAMPLE DATA and ROADMAP.
+ */
+export type ChipTone = 'default' | 'accent' | 'amber' | 'green' | 'rose' | 'muted' | 'dashed';
 export type ChipSize = 'md' | 'sm' | 'xs';
 
 const tones: Record<ChipTone, string> = {
   default: 'border-solid border-strong text-secondary',
   accent: 'border-solid border-accent-line bg-accent-tint text-accent',
   amber: 'border-solid border-amber-line bg-amber-soft text-amber',
+  green: 'border-solid border-green-line bg-green-soft text-green',
+  rose: 'border-solid border-rose-line bg-rose-soft text-rose',
+  muted: 'border-solid border-transparent bg-raised text-secondary',
   dashed: 'border-dashed border-dash text-muted',
 };
 

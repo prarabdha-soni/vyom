@@ -1,6 +1,5 @@
-import { architecture } from '@/content/products';
+import { architecture } from '@/content/platform';
 import { ArrowRightIcon } from '@/components/icons';
-import { MockPanel } from './MockPanel';
 import { cn } from '@/lib/cn';
 
 const flowTone = {
@@ -10,22 +9,10 @@ const flowTone = {
 } as const;
 
 /**
- * The five-stage pipeline over the four things that hold it up.
- *
- * Drawn with HTML/CSS boxes rather than SVG so it reflows on a phone and the
- * labels stay selectable text.
- *
- * On the Vyom OS product page this is a sample screen and carries the chip.
- * On /platform it is the real architecture, so it is shown unframed.
+ * The five-stage pipeline over the four things that hold it up, shown on
+ * /platform. Drawn with HTML/CSS boxes rather than SVG so it reflows on a
+ * phone and the labels stay selectable text.
  */
-export function ArchitectureDiagram() {
-  return (
-    <MockPanel title="Vyom OS" subtitle="ENGINE ARCHITECTURE">
-      <ArchitectureFlow />
-    </MockPanel>
-  );
-}
-
 export function ArchitectureFlow() {
   return (
     <div className="flex flex-col gap-5 px-[22px] py-6">

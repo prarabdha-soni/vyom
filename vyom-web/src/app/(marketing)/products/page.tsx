@@ -6,9 +6,9 @@ import { ArrowRightIcon, CheckIcon, productIcons } from '@/components/icons';
 import { Chip, Eyebrow, ScrollableTable, Section } from '@/components/ui';
 
 export const metadata: Metadata = {
-  title: 'Products',
+  title: 'Modules',
   description:
-    'Six products on one safety system: case processing, literature screening, independent audit, periodic reports, signal management and the engine behind them.',
+    'Three modules on one safety system: Vyom Radar for intake and literature screening, Vyom Verify for case processing and quality checks, and Vyom Dossier for periodic reports.',
 };
 
 export default function ProductsPage() {
@@ -40,10 +40,10 @@ export default function ProductsPage() {
                     className="group flex w-full flex-col gap-4 rounded-panel border border-line bg-surface p-7 transition-colors hover:border-strong hover:bg-raised"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-raised text-accent">
+                      <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-raised text-primary">
                         <Icon />
                       </span>
-                      <Chip tone={roadmap ? 'dashed' : 'accent'}>
+                      <Chip tone={roadmap ? 'dashed' : 'default'}>
                         {statusLabel[product.status]}
                       </Chip>
                     </div>
@@ -53,7 +53,7 @@ export default function ProductsPage() {
                       <Chip>{product.pricing}</Chip>
                       <ArrowRightIcon
                         size={16}
-                        className="shrink-0 text-dash transition-colors group-hover:text-accent"
+                        className="shrink-0 text-dash transition-colors group-hover:text-primary"
                       />
                     </div>
                   </Link>
@@ -124,7 +124,7 @@ export default function ProductsPage() {
                           className="border-t border-line px-4 py-4 text-center align-middle"
                         >
                           {has ? (
-                            <span className="inline-flex text-accent">
+                            <span className="inline-flex text-green">
                               <CheckIcon size={18} />
                               <span className="sr-only">Included in {product.name}</span>
                             </span>

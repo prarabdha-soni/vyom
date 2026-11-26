@@ -3,7 +3,7 @@ import { siteConfig } from '~/site.config';
 import { contactPage } from '@/content/contact';
 import { CheckIcon } from '@/components/icons';
 import { BenchmarkForm } from '@/components/contact/BenchmarkForm';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { Container, Eyebrow } from '@/components/ui';
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <section className="relative overflow-hidden border-b border-hairline">
-      <StarfieldBackground variant="cta" />
+      <SkyWash variant="cta" />
       <Container className="relative py-16 sm:py-24">
         <div className="flex flex-wrap items-start gap-x-16 gap-y-12">
           <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-6">
@@ -34,7 +34,7 @@ export default function ContactPage() {
               <ul className="m-0 flex list-none flex-col gap-5 p-0">
                 {contactPage.benefits.map((benefit) => (
                   <li key={benefit.title} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex shrink-0 text-accent">
+                    <span className="mt-0.5 flex shrink-0 text-green">
                       <CheckIcon />
                     </span>
                     <span className="flex flex-col gap-1">

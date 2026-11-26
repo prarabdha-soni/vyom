@@ -212,13 +212,34 @@ export function PinIcon({ size = 20, ...props }: IconProps) {
   );
 }
 
+/** Vyom Radar: a sweep across concentric range rings. */
+export function RadarIcon({ size = 22, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3" />
+      <path d="M16.2 12a4.2 4.2 0 1 1-2.1-3.6" />
+      <path d="M12 12l6.4-6.4" />
+      <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
+
+/** Vyom Dossier: a bound report with a sealed tab. */
+export function DossierIcon({ size = 22, ...props }: IconProps) {
+  return (
+    <Icon size={size} {...props}>
+      <path d="M8 3.5h7.5l3.5 3.5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2z" />
+      <path d="M15.5 3.5V7H19" />
+      <path d="M9.2 11h6.6M9.2 14h6.6M9.2 17h3.8" />
+      <path d="M4 6.5v12.5a2.5 2.5 0 0 0 2.5 2.5h9" />
+    </Icon>
+  );
+}
+
 export const productIcons = {
-  cases: CasesIcon,
-  literature: LiteratureIcon,
-  audit: AuditIcon,
-  reports: ReportsIcon,
-  signal: SignalIcon,
-  os: OsIcon,
+  radar: RadarIcon,
+  verify: AuditIcon,
+  dossier: DossierIcon,
 } as const;
 
 export function ShieldIcon({ size = 20, ...props }: IconProps) {

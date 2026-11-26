@@ -130,3 +130,21 @@ export const platformPage = {
     ],
   },
 } as const;
+
+/** The engine architecture drawn on /platform. */
+export const architecture = {
+  flow: [
+    { title: 'Ingest', tone: 'default' },
+    { title: 'Understand', tone: 'accent' },
+    { title: 'Check', tone: 'default' },
+    { title: 'Decide', tone: 'amber' },
+    { title: 'Deliver', tone: 'default' },
+  ],
+  foundationLabel: 'ON A FOUNDATION OF',
+  foundation: [
+    { title: 'Evaluation', body: 'Gold sets gate every change' },
+    { title: 'Audit trail', body: 'Time-stamped and attributable' },
+    { title: 'Model gateway', body: 'One controlled interface' },
+    { title: 'Tenant isolation', body: 'Separate, encrypted per customer' },
+  ],
+} as const;
