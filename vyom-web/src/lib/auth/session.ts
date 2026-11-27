@@ -19,6 +19,17 @@ export const SAMPLE_TENANT_SLUG = 'demo-pharma';
 /** Eight hours, matching the Vyom OS default session lifetime. */
 export const SAMPLE_SESSION_SECONDS = 8 * 60 * 60;
 
+/** The role a visitor gets when a sample-workspace link opens without a session. */
+export const SAMPLE_DEFAULT_ROLE: Role = 'reviewer';
+
+/** Every session cookie, live or sample, is set with these. */
+export const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
 /** First URL segments that are never a tenant slug. */
 export const RESERVED_PATHS = [
   'products',

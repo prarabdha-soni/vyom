@@ -6,13 +6,13 @@
  */
 
 export const homeMeta = {
-  title: 'Vyom — The operating system for modern drug safety and quality',
+  title: 'Vyom — The operating system for modern patient safety',
   description:
-    'The operating system for modern drug safety and quality. Connect fragmented evidence and workflows with traceable review across literature, cases and product-quality concerns.',
+    'The operating system for modern patient safety. Connect fragmented evidence and workflows with traceable review across literature, cases and product-quality concerns.',
 } as const;
 
 export const hero = {
-  pill: 'AI-NATIVE DRUG SAFETY & QUALITY',
+  pill: 'AI-NATIVE PATIENT SAFETY',
   /**
    * One sentence that wraps naturally. Split so `highlight` can take the
    * accent colour and the underline without the component hardcoding the
@@ -20,11 +20,16 @@ export const hero = {
    */
   headline: {
     before: 'The operating system for ',
-    highlight: 'modern drug safety and quality',
+    highlight: 'modern patient safety',
     after: '.',
   },
   subline:
     'Turn fragmented safety data and manual workflows into connected, intelligent and traceable safety operations.',
+  /**
+   * Beside the pill, at the top of the hero. Opens the sample dashboard directly (as the PV reviewer;
+   * the top bar switches role). Shown only while the sample workspace is on.
+   */
+  sampleWorkspace: { label: 'Try the sample workspace', href: '/demo-pharma/dashboard/' },
   primaryCta: { label: 'Book a Demo', href: '/book-demo' },
   secondaryCta: { label: 'Explore the Platform', href: '/platform' },
   footnote: 'Vyom connects and checks the evidence. Qualified people review it and decide.',

@@ -337,8 +337,11 @@ docker build --platform linux/amd64 -t "$REG/vyom-os:$TAG" vyom-os
 the sitemap and the Open Graph links on the console host point at the public
 site:
 
+`VYOM_SAMPLE_WORKSPACE=off` at build time leaves the sample-workspace link off
+the pre-rendered pages. The overlay also sets it at runtime.
+
 ```bash
-docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain -t "$REG/vyom-web:$TAG" vyom-web
+docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain --build-arg VYOM_SAMPLE_WORKSPACE=off -t "$REG/vyom-web:$TAG" vyom-web
 ```
 
 ```bash

@@ -11,19 +11,13 @@ import {
   SAMPLE_SESSION_SECONDS,
   SAMPLE_TENANT_SLUG,
   SESSION_COOKIE,
+  SESSION_COOKIE_OPTIONS as cookieOptions,
   homePath,
   safeNextPath,
 } from './session';
 import { sessionSecret, verifySessionToken } from './token';
 
 export type SignInState = { readonly error: string | null; readonly email?: string };
-
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/',
-};
 
 /** Only follow `next` when it stays inside the place this session may go. */
 function landing(next: FormDataEntryValue | null, home: string, tenantSlug: string, ops: boolean): string {

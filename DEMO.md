@@ -29,7 +29,7 @@ Pick one setup:
 
 | | Sample workspace | Local live stack |
 | --- | --- | --- |
-| Where | the public site, `/login` → "Explore with sample data" | `deploy/compose.yaml` on your laptop (RUNBOOK §1) |
+| Where | the public site: "Try the sample workspace" at the top of the home page, or any `/demo-pharma/…` link, which opens as PV reviewer with no sign-in | `deploy/compose.yaml` on your laptop (RUNBOOK §1) |
 | Backend | none | Vyom OS with PostgreSQL |
 | Changes | shown, never saved | saved; a decision really opens a case |
 | Switching roles | role menu in the top bar | separate browser profiles, one per role |
