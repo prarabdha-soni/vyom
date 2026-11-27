@@ -235,14 +235,19 @@ def create_app(settings: AppSettings, *, database: Database | None = None, gatew
 
     # -- health -----------------------------------------------------------------
     @app.get("/healthz")
-    def healthz() -> dict[str, Any]:
+    def healthz() -> JSONResponse:
+        """Readiness: 503 while the database is unreachable, so load balancers stop sending traffic."""
         try:
             with db.service() as connection:
                 connection.execute("select 1")
             database_status = "ok"
         except Exception:  # noqa: BLE001 - health must answer
             database_status = "unavailable"
-        return {"status": "ok" if database_status == "ok" else "degraded", "database": database_status, "ai_mode": gw.mode}
+        healthy = database_status == "ok"
+        return JSONResponse(
+            {"status": "ok" if healthy else "degraded", "database": database_status, "ai_mode": gw.mode},
+            status_code=200 if healthy else 503,
+        )
 
     # -- session ----------------------------------------------------------------
     @app.post("/v1/auth/sign-in")

@@ -1,0 +1,92 @@
+# Vyom OS API. Reaches Cloud SQL through the Auth Proxy sidecar on
+# 127.0.0.1:5432 (private IP, IAM-authorised via Workload Identity).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyom-os
+  labels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }
+    spec:
+      serviceAccountName: vyom-os
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      initContainers:
+        - name: cloud-sql-proxy
+          image: cloud-sql-proxy
+          restartPolicy: Always  # native sidecar: up before the API, down after it
+          args: ["--private-ip", "--structured-logs", "--port=5432", "--health-check", "--http-address=0.0.0.0",
+                 "--http-port=9090", "--exit-zero-on-sigterm", "$(CLOUDSQL_INSTANCE)"]
+          env:
+            - name: CLOUDSQL_INSTANCE
+              valueFrom: { configMapKeyRef: { name: vyom-os-config, key: CLOUDSQL_INSTANCE } }
+          startupProbe:
+            httpGet: { path: /startup, port: 9090 }
+            periodSeconds: 1
+            failureThreshold: 60
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+      containers:
+        - name: api
+          image: vyom-os
+          args: ["vyom-os-api"]
+          ports: [{ name: http, containerPort: 8000 }]
+          envFrom:
+            - configMapRef: { name: vyom-os-config }
+            - secretRef: { name: vyom-os-secrets }  # DATABASE_URL, APP_DATABASE_URL, VYOM_SESSION_SECRET, NCBI_API_KEY
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }  # 503 while the database is unreachable
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            tcpSocket: { port: http }  # a database outage must not restart the API
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          securityContext:
+            runAsUser: 10001
+            runAsGroup: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts: [{ name: tmp, mountPath: /tmp }]
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vyom-os
+  labels: { app.kubernetes.io/name: vyom-os }
+spec:
+  type: ClusterIP  # never exposed outside the cluster; only the console calls it
+  selector: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }
+  ports: [{ name: http, port: 8000, targetPort: http }]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vyom-os
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }

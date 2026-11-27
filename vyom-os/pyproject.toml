@@ -25,6 +25,8 @@ vyom-os-api = "vyom_os.server:main"
 vyom-seed-demo = "vyom_os.seed:main"
 vyom-weekly-sweep = "vyom_os.worker:main"
 vyom-terminology-load = "vyom_os.terminology:main"
+vyom-migrate = "vyom_os.migrate:main"
+vyom-admin = "vyom_os.admin:main"
 
 [project.optional-dependencies]
 test = ["httpx>=0.27,<1", "pytest>=8,<9"]

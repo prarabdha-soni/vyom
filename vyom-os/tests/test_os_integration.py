@@ -10,6 +10,7 @@ demo-pharma tenant and drops the database afterwards. The ``vyom_app`` and
 
 from __future__ import annotations
 
+import io
 import os
 import secrets
 from datetime import datetime, timezone
@@ -19,7 +20,7 @@ import psycopg
 import pytest
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
-from vyom_os import cases
+from vyom_os import admin, cases, migrate
 from vyom_os.ai.gateway import AiGateway
 from vyom_os.api import create_app, database_cost_sink
 from vyom_os.audit import Actor
@@ -33,7 +34,7 @@ from vyom_os.tenancy import load_tenant_by_slug
 ADMIN_URL = os.environ.get("VYOM_TEST_PG_ADMIN_URL", "")
 pytestmark = pytest.mark.skipif(not ADMIN_URL, reason="set VYOM_TEST_PG_ADMIN_URL to run PostgreSQL integration tests")
 
-MIGRATIONS = sorted((Path(__file__).resolve().parents[1] / "migrations").glob("00[2-9]_*.sql"))
+MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
 NOW = datetime(2026, 11, 26, 10, 0, tzinfo=timezone.utc)
 EMAIL_TEXT = (
     "Dear team, I am a general physician in Indore, India. A 39-year-old woman took VY-412 250 mg capsules for "
@@ -57,9 +58,8 @@ def env():
     with psycopg.connect(ADMIN_URL, autocommit=True) as admin:
         admin.execute(f'create database "{name}"')
     try:
-        with psycopg.connect(make_conninfo(ADMIN_URL, dbname=name), autocommit=True) as connection:
-            for migration in MIGRATIONS:
-                connection.execute(migration.read_text(encoding="utf-8"))
+        applied = migrate.run(make_conninfo(ADMIN_URL, dbname=name), MIGRATIONS_DIR, out=io.StringIO())
+        assert applied[0].startswith("002_") and len(applied) == len(migrate.discover(MIGRATIONS_DIR))
         password = secrets.token_urlsafe(18)
         settings = AppSettings(
             database_url=_url("vyom_service", name, "VYOM_TEST_SERVICE_PASSWORD"),
@@ -74,7 +74,8 @@ def env():
         from fastapi.testclient import TestClient
 
         client = TestClient(create_app(settings, database=db, gateway=gateway))
-        yield {"db": db, "client": client, "password": password, "seeded": seeded, "gateway": gateway, "settings": settings}
+        yield {"db": db, "client": client, "password": password, "seeded": seeded, "gateway": gateway, "settings": settings,
+               "database": name}
     finally:
         with psycopg.connect(ADMIN_URL, autocommit=True) as admin:
             admin.execute(f'drop database if exists "{name}" with (force)')
@@ -310,3 +311,77 @@ def test_sign_in_locks_after_repeated_failures(env):
         assert client.post("/v1/auth/sign-in", json={"email": "admin@demo-pharma.example", "password": "not-the-password"}).status_code == 401
     locked = client.post("/v1/auth/sign-in", json={"email": "admin@demo-pharma.example", "password": env["password"]})
     assert locked.status_code == 429
+
+
+def test_migrations_apply_once_and_refuse_edited_history(env, tmp_path):
+    url = make_conninfo(ADMIN_URL, dbname=env["database"])
+    assert migrate.run(url, MIGRATIONS_DIR, out=io.StringIO()) == []  # already applied by the fixture
+    assert migrate.run(url, MIGRATIONS_DIR, status=True, out=io.StringIO()) == []
+    edited = tmp_path / "migrations"
+    edited.mkdir()
+    for path in MIGRATIONS_DIR.glob("*.sql"):
+        (edited / path.name).write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    last = sorted(edited.glob("00[2-9]_*.sql"))[-1]
+    last.write_text(last.read_text(encoding="utf-8") + "\n-- edited after release\n", encoding="utf-8")
+    with pytest.raises(migrate.MigrationError, match="Changed after being applied"):
+        migrate.run(url, edited, out=io.StringIO())
+
+
+def test_admin_creates_the_operations_tenant_once(env):
+    name = f"vyom_it_{secrets.token_hex(4)}"
+    with psycopg.connect(ADMIN_URL, autocommit=True) as connection:
+        connection.execute(f'create database "{name}"')
+    try:
+        migrate.run(make_conninfo(ADMIN_URL, dbname=name), MIGRATIONS_DIR, out=io.StringIO())
+        fresh = Database(_url("vyom_service", name, "VYOM_TEST_SERVICE_PASSWORD"),
+                         _url("vyom_app", name, "VYOM_TEST_APP_PASSWORD"))
+        created = admin.create_ops_tenant(fresh)
+        assert created["created"] is True and created["slug"] == "vyom-internal"
+        again = admin.create_ops_tenant(fresh)
+        assert again["created"] is False and again["id"] == created["id"]
+        password = secrets.token_urlsafe(18)
+        admin.add_user(fresh, "vyom-internal", "ops@vyom.example", "ops", password)
+        with pytest.raises(admin.AdminError, match="Role"):
+            admin.add_user(fresh, "vyom-internal", "qppv@vyom.example", "qppv", password)
+        with pytest.raises(admin.AdminError, match="reserved"):
+            admin.create_tenant(fresh, "vyom-internal", "Vyom operations")
+        listed = {t["slug"]: t for t in admin.list_tenants(fresh)}
+        assert listed["vyom-internal"]["kind"] == "internal" and listed["vyom-internal"]["active_users"] == 1
+    finally:
+        with psycopg.connect(ADMIN_URL, autocommit=True) as connection:
+            connection.execute(f'drop database if exists "{name}" with (force)')
+
+
+def test_admin_onboards_and_offboards_a_client(env, tmp_path):
+    db, client = env["db"], env["client"]
+    tenant = admin.create_tenant(db, "acme-pharma", "Acme Pharma")
+    with pytest.raises(admin.AdminError, match="already exists"):
+        admin.create_tenant(db, "acme-pharma", "Acme Pharma")
+    with pytest.raises(admin.AdminError, match="real"):
+        admin.create_tenant(db, "fake-pharma", "Fake Pharma (FICTIONAL)")
+    password = secrets.token_urlsafe(18)
+    with pytest.raises(admin.AdminError, match="Role"):
+        admin.add_user(db, "acme-pharma", "ops@acme.example", "ops", password)
+    admin.add_user(db, "acme-pharma", "QPPV@acme.example", "qppv", password)
+    product = {"code": "AC-100", "name": "Acmezole 10 mg tablets", "active_ingredient": "acmezole",
+               "reference_safety_terms": ["headache", "nausea"], "rsi_version": "CCDS v3", "international_birth_date": "2020-01-31"}
+    admin.add_product(db, "acme-pharma", product)
+
+    signed_in = client.post("/v1/auth/sign-in", json={"email": "qppv@acme.example", "password": password})
+    assert signed_in.status_code == 200, signed_in.text
+    body = signed_in.json()
+    assert body["tenant"]["id"] == tenant["id"]
+    headers = {"Authorization": f"Bearer {body['token']}", "X-Tenant-ID": body["tenant"]["id"]}
+    products = client.get("/v1/products", headers=headers).json()
+    assert [p["code"] for p in products] == ["AC-100"]  # the sample tenant's products stay invisible
+    trail = client.get("/v1/audit", headers=headers).json()
+    assert {row["event_type"] for row in trail} >= {"tenant_created", "user_added", "product_added"}
+
+    admin.disable_user(db, "qppv@acme.example")
+    # Each API replica caches account status for up to 30 seconds; a replica without the entry refuses at once.
+    from fastapi.testclient import TestClient
+
+    fresh = TestClient(create_app(env["settings"], database=db, gateway=env["gateway"]))
+    assert fresh.get("/v1/me", headers=headers).status_code == 401
+    assert client.post("/v1/auth/sign-in", json={"email": "qppv@acme.example", "password": password}).status_code == 401
+    assert {t["slug"] for t in admin.list_tenants(db)} >= {"acme-pharma", "demo-pharma"}

@@ -1,7 +1,14 @@
+# Only pyproject.toml, README.md, src/ and migrations/ belong in the image.
 .env
 .env.*
 !.env.example
+.venv/
 .pytest_cache/
 __pycache__/
 *.py[cod]
+*.egg-info/
+build/
+dist/
 tests/
+scripts/
+docker-compose.yml

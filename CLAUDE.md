@@ -10,7 +10,10 @@ system-design.md   Architecture
 DESIGN.md          Visual rules — read before changing anything visual
 design/            Source-of-truth HTML mock
 sample-code.txt
-DEPLOY.md          How to ship vyom-web
+DEPLOY.md          How to ship vyom-web to Vercel (public site + sample workspace)
+deploy/            Compose stack, GKE kustomize (base + overlays), RUNBOOK.md
+CAPABILITIES.md    Shipped vs demo-only vs planned — check before promising anything
+DEMO.md            Client demo script (fictional Demo Pharma only)
 ```
 
 A later backend change for the marketing form should need to touch **only**
@@ -28,7 +31,9 @@ rules. If they conflict, ask.
   app. Middleware is the edge gateway (skip marketing; require auth and
   `x-tenant-id` on tenant routes). This is **not** a static export: middleware
   needs a server runtime. Deploy on Vercel with Root Directory `vyom-web`
-  (see `DEPLOY.md`). `images.unoptimized: true`.
+  (see `DEPLOY.md`). The client console runs as a container on GKE next to
+  Vyom OS (`deploy/RUNBOOK.md`); the image builds with
+  `NEXT_OUTPUT=standalone`. `images.unoptimized: true`.
 - **TypeScript**, strict.
 - **Tailwind CSS** v4 — tokens defined once in `@theme`, mirrored as CSS variables.
 - **Fonts** via `next/font/google`: Instrument Sans (400, 500, 600, 700),
@@ -52,6 +57,12 @@ npm run check      # typecheck + lint + build
 
 cd vyom-os
 python -m pip install -e '.[test]'
+VYOM_TEST_PG_ADMIN_URL=postgresql://postgres@127.0.0.1:5432/postgres python -m pytest
+                   # without the URL the PostgreSQL integration tests are skipped
+vyom-migrate       # apply migrations 002+ once each (MIGRATION_DATABASE_URL); never psql -f
+vyom-admin         # onboard/offboard tenants, users, products (DATABASE_URL)
+
+docker compose -f deploy/compose.yaml --env-file deploy/.env up --build -d
 ```
 
 ## Folder structure — vyom-web
@@ -99,7 +110,11 @@ site.config.ts
   seeded Vyom OS (see `content/sample-workspace/README.md`) rather than editing
   numbers by hand.
 - `VYOM_OS_URL` and `VYOM_SESSION_SECRET` are server-only; never expose them as
-  `NEXT_PUBLIC_`.
+  `NEXT_PUBLIC_`. `VYOM_SAMPLE_WORKSPACE=off` (runtime, server-only) removes the
+  sample workspace; client deployments set it.
+- Schema changes are new numbered files in `vyom-os/migrations/`. Never edit an
+  applied migration (`vyom-migrate` refuses), and keep each one backward
+  compatible with the previous release so a rollback needs no schema change.
 
 ## Content rules — non-negotiable
 

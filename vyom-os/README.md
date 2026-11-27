@@ -1,28 +1,68 @@
-# Vyom OS Engine
+# Vyom OS
 
-This directory is **vyom-os** (FastAPI). It contains two distinct paths:
+The FastAPI backend for Vyom's pharmacovigilance suite: literature screening
+(Radar), case processing (Verify) and periodic reports (Dossier). The package
+is `vyom_os`. `vyom_literature` is the earlier prototype; Vyom OS reuses its
+literature sources and Vertex AI client.
 
-- **v1 prototype:** the earlier PubMed/Europe PMC fetcher and Claude batch flow (`vyom-fetch`).
-- **v2 foundation:** System One routing, an append-only decision ledger, and a public-literature sweep (`vyom-sweep`).
+- How to deploy it: `../deploy/RUNBOOK.md`.
+- What is shipped and what is planned: `../CAPABILITIES.md`.
 
-The v2 path includes ICSR intake APIs, a public-literature sweep, selective System Two drafting, reviewer APIs, and gold-based evaluation. OCR/PDF extraction, a browser workbench, FHIR NHCX and E2B(R3) serializers, automated scheduling, enterprise identity, and production authorization remain deployment/product work.
+## Run it locally
 
-## Setup
-
-Use Python 3.11 or newer:
+Python 3.11 or newer, and PostgreSQL 16:
 
 ```sh
 python -m pip install -e '.[test]'
-cp .env.example .env.local
 ```
 
-Fill `.env.local` locally. Never commit it or paste secrets into chat. Use a rotated Postgres credential and URL-encode reserved characters in `DATABASE_URL`.
-
-Start the Docker Compose services with the same local environment file:
+Apply the migrations with an owner connection, then start the API with the
+two application roles:
 
 ```sh
-docker compose --env-file .env.local up --build
+MIGRATION_DATABASE_URL=postgresql://postgres@127.0.0.1:5432/vyom vyom-migrate
 ```
+
+```sh
+DATABASE_URL=postgresql://vyom_service:…@127.0.0.1:5432/vyom \
+APP_DATABASE_URL=postgresql://vyom_app:…@127.0.0.1:5432/vyom \
+VYOM_SESSION_SECRET=… vyom-os-api
+```
+
+Set both URLs explicitly; a `.env.local` in this directory is also read, but
+never commit it. The API binds to `127.0.0.1:8000`. To run the whole stack in
+containers instead, use `docker compose -f ../deploy/compose.yaml` (see the
+runbook, §1).
+
+| Command | What it does |
+| --- | --- |
+| `vyom-os-api` | The API (`API_HOST`, `API_PORT`) |
+| `vyom-migrate` | Applies `migrations/002…` in order, each exactly once, and records each file's checksum in `schema_migrations`. It refuses edited history. `--status` reports only; `--baseline` adopts a database migrated by hand. It also sets the `vyom_app` and `vyom_service` passwords from `VYOM_APP_DB_PASSWORD` and `VYOM_SERVICE_DB_PASSWORD` |
+| `vyom-admin` | `create-ops-tenant`, `create-tenant`, `add-user`, `disable-user`, `add-product`, `list`; every change is audited |
+| `vyom-seed-demo --confirm-fictional` | The fictional `demo-pharma` tenant and its sample work (`VYOM_DEMO_PASSWORD`). Never on a client database |
+| `vyom-weekly-sweep` | The literature sweep for every client tenant (`--include-fictional` for the demo) |
+| `vyom-terminology-load` | Loads a tenant's own licensed MedDRA release |
+
+## Configuration
+
+| Variable | Notes |
+| --- | --- |
+| `DATABASE_URL` | `vyom_service`, which bypasses row-level security: sign-in, jobs, `vyom-admin` |
+| `APP_DATABASE_URL` | `vyom_app`, which is subject to row-level security: every request |
+| `VYOM_SESSION_SECRET` | At least 32 characters, shared with the console |
+| `VYOM_AI_MODE` | `demo` (the rule-based engine, with no network calls) or `live` |
+| `VERTEX_PROJECT_ID`, `VERTEX_REGION`, `VERTEX_MODEL_ID`, `VERTEX_DRAFTING_MODEL_ID`, `VERTEX_SAMPLER_VERSION` | Live mode. Credentials come from Workload Identity, never from a key file |
+| `LOCAL_LLM_BASE_URL`, `LOCAL_LLM_MODEL`, `LOCAL_LLM_API_KEY` | Optional. An in-network, OpenAI-compatible model for case data that may not leave the client's network |
+| `NCBI_TOOL`, `NCBI_EMAIL`, `NCBI_API_KEY`, `VYOM_EUROPEPMC` | Live literature sources |
+| `VYOM_TIMEZONE` | Default `Asia/Kolkata` |
+| `VYOM_SESSION_TTL_SECONDS` | Default 8 hours |
+| `VYOM_API_DOCS` | Serves the OpenAPI docs when set to `true` |
+
+## Legacy prototype (`vyom_literature`)
+
+The commands `vyom-fetch`, `vyom-sweep`, `vyom-api`, `vyom-gold-import`,
+`vyom-report` and `vyom-export-training` belong to the earlier prototype. The
+docs below describe it and are kept for reference.
 
 Required for v2:
 
@@ -36,14 +76,7 @@ Required for v2:
 
 The local endpoint must implement the TypeSafe `system_one` request/response contract. A plain Ollama-compatible `/v1` endpoint is not sufficient evidence of compatibility. Contract-test it with synthetic data before sending PHI. `pv_literature` is the only domain routed to the hosted client; `pv_icsr` routes locally.
 
-Apply the additive v2 schemas to a fresh or deliberately prepared database in order:
-
-```sh
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migrations/002_system_one_decision_ledger.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f migrations/003_gold_set_labels.sql
-```
-
-The older `001_initial_schema.sql` belongs to the v1 prototype and is not required by v2. Review and back up any non-empty database before applying migrations.
+Migrations are applied with `vyom-migrate` (above), never with `psql -f`.
 
 Add versioned public-literature strategies to `strategies`, for example:
 
@@ -95,8 +128,17 @@ The sweep preserves raw source payloads, deduplicates canonical public states, r
 
 ## Tests
 
-Tests use mock records, fake providers, and an in-memory ledger double; they do not connect to Supabase or call TypeSafe:
+Unit tests use mock records and fake providers. They call no external
+service:
 
 ```sh
 python -m pytest
+```
+
+The PostgreSQL integration tests also run when you point them at a server
+where they may create and drop scratch databases and the two application
+roles:
+
+```sh
+VYOM_TEST_PG_ADMIN_URL=postgresql://postgres@127.0.0.1:5432/postgres python -m pytest
 ```

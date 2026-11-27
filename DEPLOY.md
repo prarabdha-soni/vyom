@@ -5,6 +5,10 @@ The public site and the signed-in app live in **`vyom-web/`**. Set Vercel’s
 server runtime, so this is a standard Next.js deploy — not a static `out/`
 export.
 
+Vercel hosts the public site and the fictional sample workspace. A client's
+signed-in console, which handles real case data, runs on GKE next to Vyom OS
+in the client's region: see `deploy/RUNBOOK.md`.
+
 ---
 
 ## 1. Before you start

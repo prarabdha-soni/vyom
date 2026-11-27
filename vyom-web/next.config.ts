@@ -11,6 +11,8 @@ const retiredProducts: Record<string, string> = {
 };
 
 const nextConfig: NextConfig = {
+  // Container images (deploy/) build a self-contained server; Vercel builds are unchanged.
+  output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,

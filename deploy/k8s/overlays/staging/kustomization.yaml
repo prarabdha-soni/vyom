@@ -1,0 +1,68 @@
+# Staging: production's shape with one replica each, the demo rule engine and
+# the fictional sample workspace on. Give it its own project. Every
+# environment-specific value lives in this file: replace each YOUR_* and
+# console-staging.YOUR_DOMAIN, then check
+#   kubectl kustomize deploy/k8s/overlays/staging | grep -nE 'YOUR_|example\.invalid|image: vyom-(os|web)$'
+# prints nothing.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vyom-staging
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+configMapGenerator:
+  - name: vyom-os-config
+    behavior: merge
+    literals:
+      - CLOUDSQL_INSTANCE=YOUR_STAGING_PROJECT:asia-south1:vyom-pg
+      # To rehearse live mode, set VYOM_AI_MODE=live and add the VERTEX_* lines
+      # from the production overlay (with this project).
+      - VYOM_AI_MODE=demo
+      - NCBI_EMAIL=YOUR_TEAM_MAILBOX
+  - name: vyom-web-config
+    behavior: merge
+    literals:
+      - VYOM_SAMPLE_WORKSPACE=on
+
+images:
+  - name: vyom-os
+    newName: asia-south1-docker.pkg.dev/YOUR_STAGING_PROJECT/vyom/vyom-os
+    newTag: YOUR_RELEASE_TAG  # or digest: sha256:...
+  - name: vyom-web
+    newName: asia-south1-docker.pkg.dev/YOUR_STAGING_PROJECT/vyom/vyom-web
+    newTag: YOUR_RELEASE_TAG
+
+patches:
+  - target: { kind: ServiceAccount, name: vyom-os }
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/iam.gke.io~1gcp-service-account
+        value: vyom-os@YOUR_STAGING_PROJECT.iam.gserviceaccount.com
+  - target: { kind: ServiceAccount, name: vyom-migrate }
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/iam.gke.io~1gcp-service-account
+        value: vyom-migrate@YOUR_STAGING_PROJECT.iam.gserviceaccount.com
+  - target: { kind: Ingress, name: vyom-console }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: console-staging.YOUR_DOMAIN
+  - target: { kind: ManagedCertificate, name: vyom-console }
+    patch: |-
+      - op: replace
+        path: /spec/domains/0
+        value: console-staging.YOUR_DOMAIN
+  # Optional: a Cloud Armor policy (for example, the client's office IP ranges).
+  # - target: { kind: BackendConfig, name: vyom-web }
+  #   patch: |-
+  #     - op: add
+  #       path: /spec/securityPolicy
+  #       value: { name: vyom-console-armor }
+  - target: { kind: Deployment }
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1

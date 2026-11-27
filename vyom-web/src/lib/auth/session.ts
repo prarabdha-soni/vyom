@@ -36,6 +36,7 @@ export const RESERVED_PATHS = [
   'login',
   'ops',
   'api',
+  'healthz',
 ] as const;
 
 const PUBLIC_EXACT = new Set([
@@ -54,6 +55,8 @@ const PUBLIC_EXACT = new Set([
   '/terms',
   '/quality',
   '/benchmark',
+  // Load-balancer health check (container deployments).
+  '/healthz',
   // Crawler files: the edge gateway must never send these to /login.
   '/robots.txt',
   '/sitemap.xml',

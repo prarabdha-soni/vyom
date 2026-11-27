@@ -47,9 +47,10 @@ export const siteConfig = {
   /**
    * Offers the sample workspace on /login: the fictional tenant demo-pharma,
    * browsable without a backend. Its data is SAMPLE DATA and changes made
-   * there are not saved.
+   * there are not saved. A client deployment turns it off at runtime with
+   * VYOM_SAMPLE_WORKSPACE=off (read on the server only).
    */
-  sampleWorkspace: true,
+  sampleWorkspace: process.env.VYOM_SAMPLE_WORKSPACE !== 'off',
 
   /** Placeholders — replace the bracketed values. */
   email: '[YOUR EMAIL]',

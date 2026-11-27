@@ -1,0 +1,66 @@
+# Production for one client region. Every environment-specific value lives in
+# this file: replace each YOUR_* and console.YOUR_DOMAIN, then check
+#   kubectl kustomize deploy/k8s/overlays/production | grep -nE 'YOUR_|example\.invalid|image: vyom-(os|web)$'
+# prints nothing.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vyom
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+configMapGenerator:
+  - name: vyom-os-config
+    behavior: merge
+    literals:
+      - CLOUDSQL_INSTANCE=YOUR_PROJECT:asia-south1:vyom-pg
+      - VYOM_AI_MODE=live
+      - VERTEX_PROJECT_ID=YOUR_PROJECT
+      - VERTEX_REGION=asia-south1
+      # Pin the exact model versions that passed the evaluation (RUNBOOK.md §2.9),
+      # confirmed as served in VERTEX_REGION and not past their retirement date.
+      - VERTEX_MODEL_ID=YOUR_EVALUATED_SCREENING_MODEL
+      - VERTEX_DRAFTING_MODEL_ID=YOUR_EVALUATED_DRAFTING_MODEL
+      - VERTEX_SAMPLER_VERSION=vertex-v1
+      - NCBI_EMAIL=YOUR_TEAM_MAILBOX
+  - name: vyom-web-config
+    behavior: merge
+    literals:
+      - VYOM_SAMPLE_WORKSPACE=off
+
+images:
+  - name: vyom-os
+    newName: asia-south1-docker.pkg.dev/YOUR_PROJECT/vyom/vyom-os
+    newTag: YOUR_RELEASE_TAG  # or digest: sha256:...
+  - name: vyom-web
+    newName: asia-south1-docker.pkg.dev/YOUR_PROJECT/vyom/vyom-web
+    newTag: YOUR_RELEASE_TAG
+
+patches:
+  - target: { kind: ServiceAccount, name: vyom-os }
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/iam.gke.io~1gcp-service-account
+        value: vyom-os@YOUR_PROJECT.iam.gserviceaccount.com
+  - target: { kind: ServiceAccount, name: vyom-migrate }
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/iam.gke.io~1gcp-service-account
+        value: vyom-migrate@YOUR_PROJECT.iam.gserviceaccount.com
+  - target: { kind: Ingress, name: vyom-console }
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: console.YOUR_DOMAIN
+  - target: { kind: ManagedCertificate, name: vyom-console }
+    patch: |-
+      - op: replace
+        path: /spec/domains/0
+        value: console.YOUR_DOMAIN
+  # Optional: a Cloud Armor policy (for example, the client's office IP ranges).
+  # - target: { kind: BackendConfig, name: vyom-web }
+  #   patch: |-
+  #     - op: add
+  #       path: /spec/securityPolicy
+  #       value: { name: vyom-console-armor }

@@ -1,0 +1,44 @@
+# Default-deny ingress; the API accepts only the console; the console accepts
+# only Google's load balancer and health checkers, and may call only the API
+# and DNS. Enforced by GKE Dataplane V2 (on by default in Autopilot).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vyom-os-from-console
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: { matchLabels: { app.kubernetes.io/name: vyom-web } }
+      ports: [{ port: 8000, protocol: TCP }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vyom-web
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: vyom-web }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:  # Google Front Ends and health checkers
+        - ipBlock: { cidr: 130.211.0.0/22 }
+        - ipBlock: { cidr: 35.191.0.0/16 }
+      ports: [{ port: 3000, protocol: TCP }]
+  egress:
+    - to:
+        - podSelector: { matchLabels: { app.kubernetes.io/name: vyom-os, app.kubernetes.io/component: api } }
+      ports: [{ port: 8000, protocol: TCP }]
+    - ports:  # DNS, wherever the cluster resolves it (kube-dns or NodeLocal DNSCache)
+        - { port: 53, protocol: UDP }
+        - { port: 53, protocol: TCP }
