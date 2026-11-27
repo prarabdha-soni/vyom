@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { Container } from './Container';
 import { Eyebrow } from './Eyebrow';
 
@@ -20,7 +20,7 @@ export function PageHero({
 }) {
   return (
     <section className="relative overflow-hidden border-b border-hairline">
-      <StarfieldBackground variant="cta" />
+      <SkyWash variant="cta" />
       <Container className="relative flex flex-col gap-6 py-16 sm:py-24">
         <Eyebrow>{eyebrow}</Eyebrow>
         <h1

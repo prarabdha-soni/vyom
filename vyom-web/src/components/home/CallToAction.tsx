@@ -1,13 +1,13 @@
 import { siteConfig } from '~/site.config';
 import { cta } from '@/content/home';
 import { ArrowRightIcon } from '@/components/icons';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { ButtonLink, Container, Eyebrow } from '@/components/ui';
 
 export function CallToAction() {
   return (
     <section id="benchmark" className="relative overflow-hidden border-b border-hairline">
-      <StarfieldBackground variant="cta" />
+      <SkyWash variant="cta" />
       <Container className="relative py-16 sm:py-28">
         <div
           data-reveal

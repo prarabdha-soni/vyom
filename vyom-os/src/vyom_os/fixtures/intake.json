@@ -1,0 +1,75 @@
+{
+  "_notice": "SAMPLE DATA. Every report, person, place reference and product here is fictional. {d-N} is replaced with the date N days before the seed date.",
+  "reports": [
+    {
+      "id": "E1",
+      "channel": "safety_email",
+      "received_days_ago": 4,
+      "subject": "Adverse event report: VY-201",
+      "text": "Dear Drug Safety Team,\n\nI am a consultant physician at a sample hospital in Pune, India. I am reporting a 62-year-old male patient (initials R.K.) who was started on VY-201 50 mg orally once daily for hypertension on {d-14}. On {d-6} he developed severe angioedema of the lips and tongue and was admitted to hospital. VY-201 was discontinued and he was treated with intravenous steroids. The swelling resolved after discontinuation and he was discharged on {d-4}. He has a history of type 2 diabetes. Please contact me on the hospital line for follow-up.\n\nRegards,\nConsultant physician (FICTIONAL)"
+    },
+    {
+      "id": "E2",
+      "channel": "safety_email",
+      "received_days_ago": 1,
+      "subject": "My mother felt dizzy on VY-412",
+      "text": "Hello,\n\nMy mother, aged 74, has been taking VY-412 250 mg capsules for joint pain since {d-30}. Last week she felt very dizzy and had a fall at home. She did not need to go to hospital. She stopped the capsules on {d-3} and is feeling better now. I am her son and my phone number is available on request.\n\nThank you"
+    },
+    {
+      "id": "E3",
+      "channel": "call_transcript",
+      "received_days_ago": 2,
+      "subject": "Call centre note",
+      "text": "Call centre note. Caller is a pharmacist at a retail pharmacy in Ahmedabad, India. A female customer aged 30 reported nausea and vomiting after taking VY-201 50 mg. She also takes VY-412 for back pain. The caller says the customer is pregnant, about 10 weeks. Outcome unknown at the time of the call. The pharmacist agreed to be contacted for follow-up."
+    },
+    {
+      "id": "E4",
+      "channel": "safety_email",
+      "received_days_ago": 9,
+      "subject": "Serious infection on VY-305",
+      "text": "Dear colleagues,\n\nI am the treating rheumatologist at a sample hospital in Jaipur, India. A 47-year-old woman has received VY-305 40 mg subcutaneously every two weeks for rheumatoid arthritis since {d-120}. She developed pneumonia on {d-15} and was hospitalised for intravenous antibiotics. VY-305 was withheld. She is recovering. You may contact me through the hospital pharmacovigilance cell.\n\nRheumatologist (FICTIONAL)"
+    },
+    {
+      "id": "E5",
+      "channel": "safety_email",
+      "received_days_ago": 3,
+      "subject": "Angioedema with VY-201",
+      "text": "Dear Sir or Madam,\n\nI am the hospital pharmacist at a sample hospital in Pune, India. A 62-year-old man (initials R.K.) developed angioedema of the lips and tongue on {d-6} while taking VY-201 50 mg for hypertension. He was admitted to hospital. VY-201 was stopped and he has recovered. I can be reached at the hospital pharmacy for follow-up.\n\nHospital pharmacist (FICTIONAL)"
+    },
+    {
+      "id": "E6",
+      "channel": "manual_entry",
+      "received_days_ago": 2,
+      "subject": "Web form submission",
+      "text": "Web form. Reporter type: patient. Country: India. Product: VY-201. Age: 52. Sex: male. What happened: I have had a persistent dry cough since starting VY-201 three weeks ago. I was not admitted to hospital and I am still taking the medicine. Contact email provided on the form."
+    },
+    {
+      "id": "E7",
+      "channel": "safety_email",
+      "received_days_ago": 8,
+      "subject": "Capsule appearance query",
+      "text": "Hello,\n\nSome VY-412 capsules from a pack I bought look slightly discoloured. Nobody has taken them and nobody has had any problem. Please advise whether they are safe to use.\n\nRegards"
+    },
+    {
+      "id": "H1",
+      "channel": "safety_email",
+      "received_days_ago": 75,
+      "subject": "Headache report: VY-201",
+      "text": "Dear Drug Safety Team,\n\nI am a general physician in Nagpur, India. A 51-year-old woman started VY-201 50 mg orally once daily for hypertension on {d-80}. She developed a headache on {d-78}, which settled after paracetamol while she continued VY-201. She has recovered. Please contact me at my clinic for follow-up.\n\nGeneral physician (FICTIONAL)"
+    },
+    {
+      "id": "H2",
+      "channel": "call_transcript",
+      "received_days_ago": 110,
+      "subject": "Call centre note",
+      "text": "Call centre note. Caller is a pharmacist in Lucknow, India. A 66-year-old man taking VY-201 50 mg orally for hypertension since {d-130} reported dizziness on standing from {d-115}. His doctor reduced the dose and the dizziness improved. The pharmacist agreed to be contacted for follow-up."
+    },
+    {
+      "id": "H3",
+      "channel": "safety_email",
+      "received_days_ago": 140,
+      "subject": "Hyperkalaemia with VY-201",
+      "text": "Dear colleagues,\n\nI am a nephrologist at a sample hospital in Chennai, India. A 70-year-old man with chronic kidney disease received VY-201 50 mg orally for hypertension from {d-160}. On {d-145} he developed severe hyperkalaemia and was admitted to hospital. VY-201 was discontinued and he recovered after treatment. Please contact me through the hospital for follow-up.\n\nNephrologist (FICTIONAL)"
+    }
+  ]
+}

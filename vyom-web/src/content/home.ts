@@ -40,7 +40,7 @@ export const heroHeadlineText = `${hero.headline.before}${hero.headline.highligh
  */
 export const workspacePreview = {
   title: 'Safety workspace',
-  subtitle: 'DEMO-HOSPITAL (FICTIONAL)',
+  subtitle: 'DEMO-PHARMA (FICTIONAL)',
   incoming: {
     label: 'INCOMING REPORTS · TODAY',
     rows: [
@@ -196,52 +196,6 @@ export const problem = {
   ],
 } as const;
 
-export const productsSection = {
-  eyebrow: 'PRODUCTS',
-  heading: 'One safety system. Six products.',
-  lead: 'Start with one workflow and add the rest as trust grows. Every product shares the same agents, rules and evidence trail.',
-  osCta: { label: 'Talk to us about licensing', href: '/contact' },
-  cards: [
-    {
-      name: 'Vyom Cases',
-      description: 'End-to-end adverse event intake to E2B(R3)',
-      icon: 'cases',
-      badge: null,
-    },
-    {
-      name: 'Vyom Literature',
-      description: 'Weekly medical journal screening',
-      icon: 'literature',
-      badge: null,
-    },
-    {
-      name: 'Vyom Audit',
-      description: 'Independent QA across any vendor’s safety cases',
-      icon: 'audit',
-      badge: '100% · DESIGN TARGET',
-    },
-    {
-      name: 'Vyom Reports',
-      description: 'Periodic safety reports drafted from your data',
-      icon: 'reports',
-      badge: 'ROADMAP',
-    },
-    {
-      name: 'Vyom Signal',
-      description: 'Emerging risks surfaced earlier',
-      icon: 'signal',
-      badge: 'ROADMAP',
-    },
-    {
-      name: 'Vyom OS',
-      description: 'Self-hosted System One decision engine for safety teams',
-      icon: 'os',
-      badge: 'ROADMAP',
-    },
-  ] as const,
-} as const;
-
-/** Sample data for the flagship card's queue. */
 export const caseQueue = {
   label: 'CASE QUEUE · TODAY',
   rows: [
@@ -263,87 +217,57 @@ export const literatureFunnel = {
 } as const;
 
 /**
- * The six platform modules. Status is never written here: a module that maps
- * to a product takes that product's status from `products.ts`, so the two can
- * never disagree. Live Safety Intelligence has no product yet and is roadmap.
+ * The platform section. Module names, headlines and status come from
+ * `products.ts`, so the two can never disagree; only the points live here.
  */
 export const platformModules = {
   eyebrow: 'PLATFORM',
-  heading: 'One intelligent system across the safety lifecycle.',
-  lead: 'Six modules share one evidence model, so a record linked at intake is the same record that is reviewed, reported and audited. Each card shows where the module stands today.',
-  productLinkPrefix: 'Part of',
+  heading: 'Three modules. One evidence model.',
+  lead: 'A record linked at intake in Radar is the same record reviewed in Verify and reported in Dossier, so nothing is retyped and every statement keeps its source.',
+  moduleLinkLabel: 'Explore',
+  /** Points are drawn from each module's own capability list. */
   modules: [
     {
-      icon: 'intake',
-      name: 'Intelligent Safety Intake',
+      product: 'radar',
       points: [
-        'Ingest information from supported sources',
-        'Extract relevant details',
-        'Identify potential duplicates',
-        'Route records for review',
+        'Weekly literature screening with approved strategies',
+        'Intake from safety email, call notes and forms',
+        'Day zero recorded when a person confirms a case',
       ],
-      product: 'cases',
-      featured: false,
     },
     {
-      icon: 'cases',
-      name: 'Structured Case Intelligence',
+      product: 'verify',
       points: [
-        'Organise patient, product, event, reporter and supporting evidence',
-        'Highlight missing fields and conflicting information',
-        'Preserve source links',
+        'Every field linked to the passage it came from',
+        'Validity, seriousness and the clock worked out by fixed rules',
+        'Causality and approval by a safety physician',
       ],
-      product: 'cases',
-      featured: false,
     },
     {
-      icon: 'reports',
-      name: 'Regulatory Documentation',
+      product: 'dossier',
       points: [
-        'Assist with drafting and validating safety documentation',
-        'Support configured regional requirements',
-        'Keep human review and submission authorisation explicit',
+        'Sealed evidence package at the data lock point',
+        'Sections drafted from aggregates, with sources shown',
+        'QPPV sign-off with re-authentication',
       ],
-      product: 'reports',
-      featured: false,
     },
+  ],
+  more: [
     {
       icon: 'network',
-      name: 'Live Safety Intelligence',
-      points: [
-        'Explore public drug-quality alerts and historical safety incidents',
-        'Connect product and batch information to documented distribution records',
-        'Investigate potential geographic spread',
-        'Compare reports across locations and timelines',
-        'Identify evidence gaps and unresolved questions',
-      ],
-      product: null,
-      featured: true,
+      name: 'Safety Intelligence',
+      body: 'Public drug-quality alerts and historical incidents, with every statement linked to its source.',
+      chip: 'PUBLIC PREVIEW',
+      link: { label: 'Open the preview', href: '/intelligence' },
     },
     {
       icon: 'signal',
       name: 'Signal Intelligence',
-      points: [
-        'Surface potential patterns across cases, products and locations',
-        'Show supporting evidence and uncertainty',
-        'Distinguish statistical associations from established causality',
-      ],
-      product: 'signal',
-      featured: false,
-    },
-    {
-      icon: 'audit',
-      name: 'Quality & Audit',
-      points: [
-        'Track validation findings, review history, regulatory timelines and open quality issues',
-        'Preserve traceable changes and approval records',
-      ],
-      product: 'audit',
-      featured: false,
+      body: 'Patterns across cases, products and literature, with the evidence and the uncertainty shown.',
+      chip: 'ROADMAP',
+      link: null,
     },
   ],
-  /** Live Safety Intelligence has no product page; it opens the preview instead. */
-  intelligenceLink: { label: 'Open the preview', href: '/intelligence' },
 } as const;
 
 export const howItWorks = {
@@ -455,7 +379,7 @@ export const platformSection = {
 export const auditSection = {
   eyebrow: 'VYOM AUDIT',
   heading: 'Check every case. Whoever processed it.',
-  lead: 'Most safety teams quality-check a small sample of their vendor’s work, and inspectors look hard at vendor oversight. Vyom Audit checks every processed case and gives your QA team an inspection-ready evidence pack.',
+  lead: 'Most safety teams quality-check a small sample of their vendor’s work, and inspectors look hard at vendor oversight. Vyom Verify checks every processed case and gives your QA team an inspection-ready evidence pack.',
   bullets: [
     'Works across any service provider or safety database',
     'Checks coding against narrative, seriousness logic, missing fields, duplicates and timelines',

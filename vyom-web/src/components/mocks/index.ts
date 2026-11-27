@@ -1,4 +1,4 @@
-export { ArchitectureDiagram, ArchitectureFlow } from './ArchitectureDiagram';
+export { ArchitectureFlow } from './ArchitectureDiagram';
 export { AuditRecord } from './AuditRecord';
 export { AuditTrend } from './AuditTrend';
 export { CaseDetailPane } from './CaseDetailPane';
@@ -9,5 +9,4 @@ export { LiteratureFunnel } from './LiteratureFunnel';
 export { MockPanel } from './MockPanel';
 export { ReportOutline } from './ReportOutline';
 export { SafetyWorkspace } from './SafetyWorkspace';
-export { SignalBoard } from './SignalBoard';
 export { VendorScorecard } from './VendorScorecard';

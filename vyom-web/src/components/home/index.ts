@@ -6,7 +6,6 @@ export { HowItWorks } from './HowItWorks';
 export { HowWeStart } from './HowWeStart';
 export { Platform } from './Platform';
 export { Problem } from './Problem';
-export { ProductSuite } from './ProductSuite';
 export { Standards } from './Standards';
 export { Trust } from './Trust';
 export { WhyAiNative } from './WhyAiNative';

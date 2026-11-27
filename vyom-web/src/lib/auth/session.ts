@@ -1,8 +1,23 @@
-/** Cookie and path helpers shared by the edge gateway and the login stub. */
+/**
+ * Session cookie and path helpers shared by the edge gateway, the server
+ * actions and the console. Edge-safe: no Node APIs, no server-only imports.
+ */
 
-export const AUTH_COOKIE = 'vyom_token';
-export const TENANT_COOKIE = 'vyom_tenant';
-export const ROLE_COOKIE = 'vyom_role';
+import { isRole, type Role } from './roles';
+
+/**
+ * One httpOnly cookie holds the session. Its value is either the Vyom OS
+ * session token (a signed JWT) or `sample:<role>` for the sample workspace,
+ * which never talks to a backend.
+ */
+export const SESSION_COOKIE = 'vyom_session';
+export const SAMPLE_PREFIX = 'sample:';
+
+/** The fictional tenant the sample workspace shows. */
+export const SAMPLE_TENANT_SLUG = 'demo-pharma';
+
+/** Eight hours, matching the Vyom OS default session lifetime. */
+export const SAMPLE_SESSION_SECONDS = 8 * 60 * 60;
 
 /** First URL segments that are never a tenant slug. */
 export const RESERVED_PATHS = [
@@ -20,6 +35,8 @@ export const RESERVED_PATHS = [
   'intelligence',
   'login',
   'ops',
+  'api',
+  'healthz',
 ] as const;
 
 const PUBLIC_EXACT = new Set([
@@ -38,6 +55,8 @@ const PUBLIC_EXACT = new Set([
   '/terms',
   '/quality',
   '/benchmark',
+  // Load-balancer health check (container deployments).
+  '/healthz',
   // Crawler files: the edge gateway must never send these to /login.
   '/robots.txt',
   '/sitemap.xml',
@@ -94,8 +113,21 @@ export function tenantSlugFromHost(host: string, rootDomain: string | undefined)
   return sub;
 }
 
-export function safeNextPath(candidate: string | null): string | null {
+/** Only same-origin absolute paths; never `//host` or a full URL. */
+export function safeNextPath(candidate: string | null | undefined): string | null {
   if (!candidate) return null;
-  if (!candidate.startsWith('/') || candidate.startsWith('//')) return null;
+  if (!candidate.startsWith('/') || candidate.startsWith('//') || candidate.startsWith('/\\')) return null;
   return candidate;
+}
+
+/** The role inside a `sample:<role>` cookie, or null when the value is anything else. */
+export function sampleRole(value: string | undefined): Role | null {
+  if (!value?.startsWith(SAMPLE_PREFIX)) return null;
+  const role = value.slice(SAMPLE_PREFIX.length);
+  return isRole(role) ? role : null;
+}
+
+/** Where a signed-in user lands. */
+export function homePath(role: Role, tenantSlug: string): string {
+  return role === 'ops' ? '/ops/' : `/${tenantSlug}/dashboard/`;
 }

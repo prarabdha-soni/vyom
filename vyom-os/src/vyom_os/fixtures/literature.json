@@ -1,0 +1,113 @@
+{
+  "_notice": "SAMPLE DATA. Every article, author, journal and product here is fictional. Products use the fictional codes VY-201, VY-305 and VY-412. {d-N} is replaced with the date N days before the seed date.",
+  "articles": [
+    {
+      "id": "VY-LIT-0001",
+      "product": "VY-201",
+      "published_days_ago": 6,
+      "journal": "Sample Journal of Clinical Pharmacology (FICTIONAL)",
+      "authors": ["Sample R", "Example K"],
+      "title": "Maculopapular rash and fever after VY-201 initiation: a case report",
+      "abstract": "We report a 58-year-old woman who received VY-201 50 mg orally once daily for hypertension. Ten days after starting treatment she developed a widespread maculopapular rash and fever and was hospitalised for observation. VY-201 was withdrawn and she was treated with oral antihistamines. The rash resolved after discontinuation and she recovered fully within two weeks. She had a history of hypothyroidism. Clinicians should be aware of cutaneous reactions with VY-201."
+    },
+    {
+      "id": "VY-LIT-0002",
+      "product": "VY-201",
+      "published_days_ago": 5,
+      "journal": "Sample Hepatology Letters (FICTIONAL)",
+      "authors": ["Placeholder M", "Sample D"],
+      "title": "Raised liver enzymes in a patient treated with VY-201",
+      "abstract": "We describe a 34-year-old man who received VY-201 25 mg orally for hypertension. After six weeks, routine tests showed raised liver enzymes with ALT five times the upper limit of normal. He had no symptoms and was not admitted. VY-201 was discontinued and the enzymes improved within four weeks of stopping. Viral serology was negative."
+    },
+    {
+      "id": "VY-LIT-0003",
+      "product": "VY-305",
+      "published_days_ago": 4,
+      "journal": "Sample Paediatric Rheumatology Reports (FICTIONAL)",
+      "authors": ["Example N", "Fictus P"],
+      "title": "Generalised seizure in a child receiving VY-305 for juvenile arthritis",
+      "abstract": "We report a 7-year-old boy who received VY-305 20 mg subcutaneously every two weeks for juvenile arthritis. Three hours after the fourth dose he had a generalised tonic-clonic seizure lasting four minutes. He was taken to the emergency department and observed overnight. Neurological examination and imaging were normal. VY-305 was withheld and he recovered without further seizures."
+    },
+    {
+      "id": "VY-LIT-0004",
+      "product": "VY-412",
+      "published_days_ago": 4,
+      "journal": "Sample Journal of Obstetric Medicine (FICTIONAL)",
+      "authors": ["Sample T", "Example V"],
+      "title": "Exposure to VY-412 during the first trimester of pregnancy",
+      "abstract": "We report a 29-year-old woman who took VY-412 250 mg capsules for back pain during the first trimester of pregnancy before the pregnancy was recognised. She stopped the capsules at nine weeks of gestation. The pregnancy continued without complications and she delivered a healthy infant at term. No adverse event was observed in the mother or the infant."
+    },
+    {
+      "id": "VY-LIT-0005",
+      "product": "VY-201",
+      "published_days_ago": 3,
+      "journal": "Sample Toxicology Communications (FICTIONAL)",
+      "authors": ["Fictus L", "Placeholder J"],
+      "title": "Hepatic effects of high-dose VY-201 in rats",
+      "abstract": "Male rats received VY-201 at 50, 150 or 500 mg/kg/day by oral gavage for 28 days. At 500 mg/kg/day, animals showed hepatocellular hypertrophy and raised liver enzymes. No effects were seen at lower doses. This in vivo study in rats did not include human subjects."
+    },
+    {
+      "id": "VY-LIT-0006",
+      "product": "VY-305",
+      "published_days_ago": 3,
+      "journal": "Sample Reviews in Rheumatology (FICTIONAL)",
+      "authors": ["Example Q", "Sample W"],
+      "title": "VY-305 in inflammatory arthritis: a narrative review",
+      "abstract": "This narrative review summarises published evidence on the efficacy and safety of VY-305 in inflammatory arthritis. We searched sample databases and discuss dosing, monitoring and the safety profile reported in earlier studies. The review presents no new patient data."
+    },
+    {
+      "id": "VY-LIT-0007",
+      "product": "VY-201",
+      "published_days_ago": 2,
+      "journal": "Sample Cardiovascular Trials (FICTIONAL)",
+      "authors": ["Placeholder A", "Fictus B"],
+      "title": "VY-201 versus placebo in mild hypertension: a randomised controlled trial",
+      "abstract": "In this randomised, double-blind trial, 240 adults with mild hypertension received VY-201 50 mg or placebo for 12 weeks. Headache was reported by 12% of participants on VY-201 and 7% on placebo, and dizziness by 6% and 4%. No serious adverse events were attributed to treatment. Individual patient details are not reported."
+    },
+    {
+      "id": "VY-LIT-0008",
+      "product": "VY-412",
+      "published_days_ago": 2,
+      "journal": "Sample Emergency Medicine Cases (FICTIONAL)",
+      "authors": ["Sample H", "Example C"],
+      "title": "Bradycardia and hypotension after VY-412 overdose in an older adult",
+      "abstract": "We describe a 71-year-old man who took 20 capsules of VY-412 250 mg in an intentional overdose. He presented with bradycardia and hypotension, which were life-threatening, and was admitted to the intensive care unit. He was treated with intravenous fluids and atropine. He recovered over three days and was discharged after psychiatric review."
+    },
+    {
+      "id": "VY-LIT-0009",
+      "product": "VY-305",
+      "published_days_ago": 1,
+      "journal": "Sample Pharmacoepidemiology Journal (FICTIONAL)",
+      "authors": ["Fictus R", "Sample E"],
+      "title": "Injection site reactions with VY-305: a retrospective cohort study",
+      "abstract": "This retrospective cohort study reviewed records of 1200 patients who started VY-305 at sample clinics. Injection site reactions were recorded in 4.1% of patients, most within the first month. No individual patient narratives are presented."
+    },
+    {
+      "id": "VY-LIT-0010",
+      "product": "VY-201",
+      "published_days_ago": 1,
+      "journal": "Sample Clinical Case Notes (FICTIONAL)",
+      "authors": ["Example F", "Placeholder G"],
+      "title": "Lack of efficacy of VY-201 in a patient with confirmed adherence",
+      "abstract": "We report a 45-year-old woman whose blood pressure remained uncontrolled despite VY-201 50 mg daily for three months with confirmed adherence. This lack of efficacy led to a change of treatment. She was not hospitalised and her blood pressure was controlled on the new treatment."
+    },
+    {
+      "id": "VY-LIT-0011",
+      "product": "VY-412",
+      "published_days_ago": 0,
+      "journal": "Sample Dermatology Case Reports (FICTIONAL)",
+      "authors": ["Sample O", "Fictus U"],
+      "title": "Fatal Stevens-Johnson syndrome associated with VY-412",
+      "abstract": "We report a 63-year-old woman who started VY-412 250 mg capsules for osteoarthritis pain. Eighteen days later she developed Stevens-Johnson syndrome with mucosal involvement and was hospitalised. VY-412 was withdrawn. Despite intensive care she died on the twelfth day of hospitalisation."
+    },
+    {
+      "id": "VY-LIT-0012",
+      "product": "VY-305",
+      "published_days_ago": 0,
+      "journal": "Sample Cell Pharmacology (FICTIONAL)",
+      "authors": ["Placeholder S", "Example Y"],
+      "title": "VY-305 binding in cultured synovial cell lines",
+      "abstract": "We studied VY-305 binding in cultured synovial cell lines in vitro. Binding was concentration dependent and reversible. These in vitro findings have no direct clinical implication and the study did not involve patients."
+    }
+  ]
+}

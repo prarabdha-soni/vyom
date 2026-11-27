@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { bookDemoPage } from '@/content/bookDemo';
 import { CheckIcon } from '@/components/icons';
 import { BenchmarkForm } from '@/components/contact/BenchmarkForm';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { Container, Eyebrow } from '@/components/ui';
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function BookDemoPage() {
   return (
     <section className="relative overflow-hidden border-b border-hairline">
-      <StarfieldBackground variant="cta" />
+      <SkyWash variant="cta" />
       <Container className="relative py-16 sm:py-24">
         <div className="flex flex-wrap items-start gap-x-16 gap-y-12">
           <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-6">
@@ -28,7 +28,7 @@ export default function BookDemoPage() {
             <ul className="m-0 flex list-none flex-col gap-3 p-0">
               {bookDemoPage.points.map((point) => (
                 <li key={point} className="flex items-start gap-3 text-[15.5px] leading-[1.5] text-secondary">
-                  <span className="mt-0.5 flex shrink-0 text-accent">
+                  <span className="mt-0.5 flex shrink-0 text-green">
                     <CheckIcon />
                   </span>
                   <span>{point}</span>

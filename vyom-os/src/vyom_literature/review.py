@@ -5,9 +5,9 @@ from typing import Any, Literal
 from uuid import UUID
 
 
-ReviewRole = Literal["safety_physician", "pv_associate", "cpc_coder", "tpa_auditor"]
+ReviewRole = Literal["safety_physician", "pv_associate", "cpc_coder", "tpa_auditor", "qppv"]
 ReviewAction = Literal["ACCEPT", "CORRECT", "ESCALATE"]
-VALID_ROLES = {"safety_physician", "pv_associate", "cpc_coder", "tpa_auditor"}
+VALID_ROLES = {"safety_physician", "pv_associate", "cpc_coder", "tpa_auditor", "qppv"}
 VALID_ACTIONS = {"ACCEPT", "CORRECT", "ESCALATE"}
 
 

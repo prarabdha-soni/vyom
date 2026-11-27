@@ -1,0 +1,41 @@
+# Vyom on GKE: the API (with a Cloud SQL Auth Proxy sidecar), the console,
+# the migration Job and the weekly literature sweep. Overlays set the project,
+# region, hostnames, image tags and replica counts. Secrets are never here:
+# RUNBOOK.md creates them from Secret Manager.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: vyom
+    includeSelectors: false
+
+resources:
+  - serviceaccounts.yaml
+  - api.yaml
+  - web.yaml
+  - migrate-job.yaml
+  - sweep-cronjob.yaml
+  - ingress.yaml
+  - networkpolicies.yaml
+
+configMapGenerator:
+  - name: vyom-os-config
+    options:
+      labels: { vyom/phase: migrate }  # the migrate Job reads it too
+    literals:
+      - VYOM_AI_MODE=demo
+      - VYOM_TIMEZONE=Asia/Kolkata
+      - VYOM_MIGRATIONS_DIR=/app/migrations
+      - NCBI_TOOL=vyom
+      - CLOUDSQL_INSTANCE=YOUR_PROJECT:asia-south1:vyom-pg
+  - name: vyom-web-config
+    literals:
+      - VYOM_OS_URL=http://vyom-os:8000
+      - VYOM_SAMPLE_WORKSPACE=off
+
+# vyom-os and vyom-web are set by each overlay (registry and release tag).
+images:
+  - name: cloud-sql-proxy
+    newName: gcr.io/cloud-sql-connectors/cloud-sql-proxy
+    newTag: "2.11.0"  # bump to the current release and pin by digest

@@ -10,16 +10,20 @@ system-design.md   Architecture
 DESIGN.md          Visual rules — read before changing anything visual
 design/            Source-of-truth HTML mock
 sample-code.txt
-DEPLOY.md          How to ship vyom-web
+DEPLOY.md          How to ship vyom-web to Vercel (public site + sample workspace)
+deploy/            Compose stack, GKE kustomize (base + overlays), RUNBOOK.md
+CAPABILITIES.md    Shipped vs demo-only vs planned — check before promising anything
+DEMO.md            Client demo script (fictional Demo Pharma only)
 ```
 
 A later backend change for the marketing form should need to touch **only**
 `vyom-web/src/lib/api.ts`. Tenant-app calls to FastAPI go through
 `vyom-web/src/lib/gateway/api-client.ts`.
 
-The design file `design/Vyom Home Screen.html` is the source of truth for the
-look; the build brief is the source of truth for content, structure and rules.
-If the two conflict, ask.
+The design file `design/Vyom Home Screen.html` is the source of truth for
+layout; since 2026-11-27 its colours are superseded by the light palette in
+`DESIGN.md`. The build brief is the source of truth for content, structure and
+rules. If they conflict, ask.
 
 ## Stack — vyom-web
 
@@ -27,7 +31,9 @@ If the two conflict, ask.
   app. Middleware is the edge gateway (skip marketing; require auth and
   `x-tenant-id` on tenant routes). This is **not** a static export: middleware
   needs a server runtime. Deploy on Vercel with Root Directory `vyom-web`
-  (see `DEPLOY.md`). `images.unoptimized: true`.
+  (see `DEPLOY.md`). The client console runs as a container on GKE next to
+  Vyom OS (`deploy/RUNBOOK.md`); the image builds with
+  `NEXT_OUTPUT=standalone`. `images.unoptimized: true`.
 - **TypeScript**, strict.
 - **Tailwind CSS** v4 — tokens defined once in `@theme`, mirrored as CSS variables.
 - **Fonts** via `next/font/google`: Instrument Sans (400, 500, 600, 700),
@@ -51,6 +57,12 @@ npm run check      # typecheck + lint + build
 
 cd vyom-os
 python -m pip install -e '.[test]'
+VYOM_TEST_PG_ADMIN_URL=postgresql://postgres@127.0.0.1:5432/postgres python -m pytest
+                   # without the URL the PostgreSQL integration tests are skipped
+vyom-migrate       # apply migrations 002+ once each (MIGRATION_DATABASE_URL); never psql -f
+vyom-admin         # onboard/offboard tenants, users, products (DATABASE_URL)
+
+docker compose -f deploy/compose.yaml --env-file deploy/.env up --build -d
 ```
 
 ## Folder structure — vyom-web
@@ -64,18 +76,45 @@ src/
       pricing/                  /pricing
       book-demo/                /book-demo
       products/[slug]/          existing product pages
-    (auth)/login/               /login
-    (platform)/[tenant_slug]/   Auth + TenantProvider
-      dashboard/ console/ settings/
-    (internal)/ops/             /ops
+    (auth)/login/               /login (sign-in + sample workspace picker)
+    (platform)/[tenant_slug]/   Console shell (icon rail, top bar)
+      dashboard/                KPIs, pipeline, activity
+      radar/ radar/[stateId]/   Literature screening (module: Vyom Radar)
+      verify/ verify/new/ verify/[caseNumber]/
+                                Case processing + E2B (module: Vyom Verify)
+      dossier/ dossier/[reportNumber]/
+                                PBRER / PADER authoring + sign-off (Vyom Dossier)
+      audit/ settings/
+    (internal)/ops/             /ops (ops role only)
   components/
+    console/                    Console UI: ui.tsx kit, forms.tsx, ShellClient,
+                                radar/ verify/ dossier/ client controls
   content/                      All copy lives here
+    console.ts                  All console copy and labels
+    sample-workspace/           snapshot.json + README (fictional demo-pharma data)
   lib/
     api.ts                      Marketing form boundary
-    gateway/api-client.ts       JWT + X-Tenant-ID → vyom-os
-    tenant/TenantContext.tsx
+    auth/                       session cookie, token verify, server actions, roles
+    console/                    data.ts loaders, actions.ts mutations, sample.ts
+    gateway/api-client.ts       JWT + X-Tenant-ID → vyom-os (server-only)
+    gateway/types.ts            Vyom OS API types
 site.config.ts
 ```
+
+### Console
+
+- Every console page loads through `lib/console/data.ts`, which serves either
+  Vyom OS (live session) or the sample snapshot (`vyom_session=sample:<role>`).
+  Mutations in `lib/console/actions.ts` never send anything in sample mode.
+- The sample snapshot's dates are shifted to today on load. Regenerate it from a
+  seeded Vyom OS (see `content/sample-workspace/README.md`) rather than editing
+  numbers by hand.
+- `VYOM_OS_URL` and `VYOM_SESSION_SECRET` are server-only; never expose them as
+  `NEXT_PUBLIC_`. `VYOM_SAMPLE_WORKSPACE=off` (runtime, server-only) removes the
+  sample workspace; client deployments set it.
+- Schema changes are new numbered files in `vyom-os/migrations/`. Never edit an
+  applied migration (`vyom-migrate` refuses), and keep each one backward
+  compatible with the previous release so a rollback needs no schema change.
 
 ## Content rules — non-negotiable
 
@@ -89,7 +128,8 @@ site.config.ts
    A number that is none of these does not belong on the site.
 3. **Sample screens use only fictional identifiers**: drug codes `VY-201`, `VY-305`,
    `VY-412`, case ids `VY-CASE-xxxx`, and `Vendor A`. Vendor A is marked `(FICTIONAL)`.
-   Sample tenants are `demo-hospital` and `demo-tpa`, marked `(FICTIONAL)`.
+   The sample tenant is `demo-pharma`, marked `(FICTIONAL)` (agreed 2026-11-27;
+   `demo-hospital` and `demo-tpa` are retired), with users at `@demo-pharma.example`.
    **Exception (agreed 2026-10-27):** `/intelligence` shows real public-source
    incidents. Every statement there cites a source that was actually read, the
    content carries a `PUBLIC SOURCE` chip, and a company is named only as the
@@ -99,11 +139,13 @@ site.config.ts
 5. **The Concept preview notice bar** is controlled by one flag in `site.config.ts`
    (`showNotice`).
 6. **All copy lives in typed content files** under `src/content/`. Components render
-   content; they never hold it. `products.ts` has a `flagship` setting, default `"cases"`.
+   content; they never hold it. `products.ts` lists the three modules — Vyom Radar,
+   Vyom Verify, Vyom Dossier — and has a `flagship` setting, default `"verify"`.
 7. **Placeholders stay visibly marked** — `[YOUR EMAIL]` and friends live in
    `site.config.ts` and keep their brackets until the owner replaces them.
 8. Blue accent means **AI activity**. Amber means **a human or physician decision**.
-   Never mix them.
+   Never mix them. Green means **verified or complete**; rose means **locked or
+   overdue**. Output of the rule-based demo engine is not AI and is never blue.
 9. **Indian English** spelling, as in the design: "hospitalised", "signal",
    "programme" where it occurs.
 

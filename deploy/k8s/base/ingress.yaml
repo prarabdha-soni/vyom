@@ -1,0 +1,38 @@
+# HTTPS for the console only, on a reserved static IP with a Google-managed
+# certificate. The API has no ingress. Overlays set the hostname.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vyom-console
+  annotations:
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: vyom-console
+    networking.gke.io/managed-certificates: vyom-console
+    networking.gke.io/v1beta1.FrontendConfig: vyom-console
+    kubernetes.io/ingress.allow-http: "true"  # needed for the HTTPS redirect below
+spec:
+  defaultBackend:
+    service: { name: vyom-web, port: { number: 3000 } }
+  rules:
+    - host: console.example.invalid
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: vyom-web, port: { number: 3000 } }
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: vyom-console
+spec:
+  domains: ["console.example.invalid"]
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: vyom-console
+spec:
+  redirectToHttps: { enabled: true, responseCodeName: MOVED_PERMANENTLY_DEFAULT }
+  sslPolicy: vyom-tls12-modern  # created once: see RUNBOOK.md

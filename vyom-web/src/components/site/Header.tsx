@@ -6,21 +6,19 @@ import { MegaMenu } from './MegaMenu';
 import { MobileNav } from './MobileNav';
 
 export function Header() {
-  const secondaryLinks = primaryNav.filter((link) => link.label !== 'Products');
-
   return (
-    <header className="border-b border-hairline">
+    <header className="relative z-40 border-b border-hairline bg-surface/85 backdrop-blur-md">
       <Container>
-        <nav aria-label="Main" className="flex items-center justify-between gap-6 py-3.5">
+        <nav aria-label="Main" className="relative flex items-center justify-between gap-6 py-3.5">
           <Logo />
 
           <div className="hidden items-center gap-0.5 lg:flex">
             <MegaMenu />
-            {secondaryLinks.map((link) => (
+            {primaryNav.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex min-h-[44px] items-center px-2 text-[14px] font-medium whitespace-nowrap text-secondary transition-colors hover:text-primary xl:px-3.5 xl:text-[15px]"
+                className="flex min-h-[40px] items-center rounded-full px-2.5 text-[14px] font-medium whitespace-nowrap text-secondary transition-colors hover:bg-raised hover:text-primary xl:px-3.5 xl:text-[15px]"
               >
                 {link.label}
               </Link>

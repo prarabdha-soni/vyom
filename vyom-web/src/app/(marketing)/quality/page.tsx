@@ -27,7 +27,7 @@ export default function QualityPage() {
               href={qualityPage.notice.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 self-start font-mono text-[12px] text-accent underline underline-offset-4"
+              className="inline-flex min-h-11 items-center gap-2 self-start font-mono text-[12px] text-primary underline underline-offset-4"
             >
               {qualityPage.notice.citation}
               <ArrowRightIcon />
@@ -54,7 +54,7 @@ export default function QualityPage() {
                   href={area.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-auto inline-flex min-h-11 items-center font-mono text-[11px] text-accent underline underline-offset-4"
+                  className="mt-auto inline-flex min-h-11 items-center font-mono text-[11px] text-primary underline underline-offset-4"
                 >
                   {area.citation} · G.S.R. 922(E)
                 </a>
@@ -68,7 +68,7 @@ export default function QualityPage() {
         <div className="flex flex-col items-start gap-6">
           <div className="flex flex-col gap-2">
             <p className="m-0 max-w-[820px] text-[16px] leading-[1.65] text-muted">{qualityPage.closing}</p>
-            <a href={qualityPage.notice.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center self-start font-mono text-[11px] text-accent underline underline-offset-4">
+            <a href={qualityPage.notice.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center self-start font-mono text-[11px] text-primary underline underline-offset-4">
               {qualityPage.closingCitation}
             </a>
           </div>

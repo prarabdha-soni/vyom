@@ -83,7 +83,7 @@ export default function PlatformPage() {
                 </span>
                 <p className="m-0 text-[15px] leading-[1.6] text-muted">{metric.body}</p>
                 {/* Each card says it is a measure, not a result. */}
-                <Chip tone="accent" className="mt-auto self-start">
+                <Chip tone="default" className="mt-auto self-start">
                   {measurement.badge}
                 </Chip>
               </li>
@@ -92,9 +92,9 @@ export default function PlatformPage() {
 
           <div
             data-reveal
-            className="flex flex-col gap-2.5 rounded-card border border-accent-line bg-surface p-7"
+            className="flex flex-col gap-2.5 rounded-card border border-strong bg-surface p-7"
           >
-            <span className="font-mono text-[12px] font-medium tracking-[0.14em] text-accent uppercase">
+            <span className="font-mono text-[12px] font-medium tracking-[0.14em] text-meta uppercase">
               {evaluation.eyebrow}
             </span>
             <span className="text-[21px] leading-[1.25] font-semibold tracking-[-0.01em] text-primary">
@@ -138,7 +138,7 @@ export default function PlatformPage() {
                   key={item.title}
                   className="flex flex-col gap-3 rounded-card border border-line bg-surface p-6"
                 >
-                  <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-raised text-accent">
+                  <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-raised text-primary">
                     <Icon />
                   </span>
                   <span className="text-[17px] font-semibold text-primary">{item.title}</span>

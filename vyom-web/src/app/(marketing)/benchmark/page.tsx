@@ -13,7 +13,7 @@ export default function BenchmarkPage() {
       <PageHero eyebrow={benchmarkPage.eyebrow} heading={benchmarkPage.heading} lead={benchmarkPage.lead}>
         <a
           href={benchmarkPage.methodLink.href}
-          className="inline-flex min-h-11 items-center font-mono text-[12px] text-accent underline underline-offset-4"
+          className="inline-flex min-h-11 items-center font-mono text-[12px] text-primary underline underline-offset-4"
         >
           {benchmarkPage.methodLink.label}
         </a>
@@ -54,7 +54,7 @@ export default function BenchmarkPage() {
                       </div>
                     </dl>
                     {run.resultHref ? (
-                      <a href={run.resultHref} className="inline-flex min-h-11 items-center self-start font-mono text-[12px] text-accent underline underline-offset-4">
+                      <a href={run.resultHref} className="inline-flex min-h-11 items-center self-start font-mono text-[12px] text-primary underline underline-offset-4">
                         {benchmarkPage.resultLinkLabel}
                       </a>
                     ) : null}
@@ -91,7 +91,7 @@ export default function BenchmarkPage() {
           <ul className="m-0 flex list-none flex-wrap gap-x-6 gap-y-3 p-0">
             {benchmarkPage.method.sources.map((source) => (
               <li key={source.href}>
-                <a href={source.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-mono text-[11px] text-accent underline underline-offset-4">
+                <a href={source.href} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-mono text-[11px] text-primary underline underline-offset-4">
                   {source.label}
                 </a>
               </li>

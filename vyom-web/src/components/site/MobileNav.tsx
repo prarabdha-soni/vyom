@@ -3,7 +3,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import Link from 'next/link';
 import { useState } from 'react';
-import { headerActions, primaryNav } from '@/content/site';
+import { headerActions, platformMenu, primaryNav } from '@/content/site';
 import { products, statusLabel } from '@/content/products';
 import { CloseIcon, MenuIcon, productIcons } from '@/components/icons';
 import { ButtonLink, Chip } from '@/components/ui';
@@ -31,7 +31,7 @@ export function MobileNav() {
         <Dialog.Content className="fixed inset-0 z-50 overflow-y-auto bg-page focus:outline-none">
           <Dialog.Title className="sr-only">Menu</Dialog.Title>
           <Dialog.Description className="sr-only">
-            Site navigation and links to every Vyom product.
+            Site navigation and links to every Vyom module.
           </Dialog.Description>
 
           <div className="flex items-center justify-between border-b border-hairline px-4 py-3.5">
@@ -50,7 +50,7 @@ export function MobileNav() {
           <nav aria-label="Main" className="flex flex-col gap-8 px-4 py-8">
             <ul className="m-0 flex list-none flex-col gap-1 p-0">
               <li className="pb-2 font-mono text-[11.5px] font-medium tracking-[0.12em] text-meta">
-                PRODUCTS
+                {platformMenu.heading}
               </li>
               {products.map((product) => {
                 const Icon = productIcons[product.slug];
@@ -61,7 +61,7 @@ export function MobileNav() {
                       onClick={close}
                       className="flex items-start gap-3 rounded-nested py-2.5"
                     >
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-button border border-strong bg-surface text-accent">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-button border border-strong bg-surface text-primary">
                         <Icon size={18} />
                       </span>
                       <span className="flex min-w-0 flex-col gap-1">
@@ -70,7 +70,7 @@ export function MobileNav() {
                             {product.name}
                           </span>
                           <Chip
-                            tone={product.status === 'roadmap' ? 'dashed' : 'accent'}
+                            tone={product.status === 'roadmap' ? 'dashed' : 'default'}
                             size="xs"
                           >
                             {statusLabel[product.status]}
@@ -87,19 +87,17 @@ export function MobileNav() {
             </ul>
 
             <ul className="m-0 flex list-none flex-col border-t border-hairline p-0 pt-4">
-              {primaryNav
-                .filter((link) => link.label !== 'Products')
-                .map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={close}
-                      className="flex min-h-[48px] items-center text-[16px] font-medium text-secondary"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+              {[...platformMenu.footer, ...primaryNav].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={close}
+                    className="flex min-h-[48px] items-center text-[16px] font-medium text-secondary"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
 
             <div className="flex flex-col gap-3">

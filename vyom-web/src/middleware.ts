@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { resolveSession } from '@/lib/auth/resolve';
 import {
-  AUTH_COOKIE,
-  ROLE_COOKIE,
-  TENANT_COOKIE,
+  SESSION_COOKIE,
+  homePath,
   isOpsPath,
   isPublicPath,
   tenantSlugFromHost,
@@ -10,63 +10,56 @@ import {
 } from '@/lib/auth/session';
 
 /**
- * Edge gateway: marketing routes pass through; /ops and /[tenant_slug]
- * require a session. Tenant routes also receive `x-tenant-id`.
+ * Edge gateway.
+ *
+ * Marketing routes pass straight through. /ops and /{tenant} need a session:
+ * either a Vyom OS token, verified here (signature, issuer, audience, expiry),
+ * or the sample workspace. A tenant route must match the session's tenant,
+ * and receives `x-tenant-id`. Pages verify the session again before reading
+ * data, so this gateway is a first line, not the only one.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(AUTH_COOKIE)?.value;
-  const loginUrl = new URL('/login', request.url);
-  loginUrl.searchParams.set('next', pathname);
-
-  if (isOpsPath(pathname)) {
-    if (!token) {
-      return NextResponse.redirect(loginUrl);
-    }
-    const role = request.cookies.get(ROLE_COOKIE)?.value;
-    if (role !== 'internal_auditor') {
-      const home = new URL('/', request.url);
-      return NextResponse.redirect(home);
-    }
-    return NextResponse.next();
-  }
-
+  const ops = isOpsPath(pathname);
   const host = request.headers.get('host') ?? '';
-  const fromHost = tenantSlugFromHost(host, process.env.NEXT_PUBLIC_ROOT_DOMAIN);
-  const fromPath = tenantSlugFromPath(pathname);
-  const tenantSlug = fromHost ?? fromPath;
+  const tenantSlug = ops
+    ? null
+    : (tenantSlugFromHost(host, process.env.NEXT_PUBLIC_ROOT_DOMAIN) ?? tenantSlugFromPath(pathname));
 
-  if (!tenantSlug) {
+  if (!ops && !tenantSlug) {
     return NextResponse.next();
   }
 
-  if (!token) {
-    return NextResponse.redirect(loginUrl);
+  const cookie = request.cookies.get(SESSION_COOKIE)?.value;
+  const session = await resolveSession(cookie);
+
+  if (!session) {
+    const loginUrl = new URL('/login/', request.url);
+    loginUrl.searchParams.set('next', pathname);
+    const response = NextResponse.redirect(loginUrl);
+    if (cookie) response.cookies.delete(SESSION_COOKIE);
+    return response;
   }
 
+  const home = new URL(homePath(session.role, session.tenantSlug), request.url);
+
+  if (ops) {
+    return session.role === 'ops' ? NextResponse.next() : NextResponse.redirect(home);
+  }
+
+  if (session.role === 'ops' || tenantSlug !== session.tenantSlug) {
+    return NextResponse.redirect(home);
+  }
+
+  const tenantId = session.mode === 'live' ? session.claims.tenantId : session.tenantSlug;
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-tenant-id', tenantSlug);
-
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-  response.headers.set('x-tenant-id', tenantSlug);
-
-  const cookieTenant = request.cookies.get(TENANT_COOKIE)?.value;
-  if (cookieTenant !== tenantSlug) {
-    response.cookies.set(TENANT_COOKIE, tenantSlug, {
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
-  }
-
-  return response;
+  requestHeaders.set('x-tenant-id', tenantId);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

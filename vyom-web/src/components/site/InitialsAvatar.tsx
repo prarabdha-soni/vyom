@@ -24,7 +24,7 @@ export function InitialsAvatar({
       className={cn(
         'flex size-14 shrink-0 items-center justify-center rounded-nested border font-mono text-[16px] font-medium tracking-[0.06em]',
         filled
-          ? 'border-accent-line bg-accent-tint text-accent'
+          ? 'border-ink bg-ink text-on-ink'
           : 'border-dashed border-dash bg-surface text-meta',
       )}
     >

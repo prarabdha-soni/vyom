@@ -1,4 +1,5 @@
 export { Button, ButtonLink } from './Button';
+export type { ButtonVariant } from './Button';
 export { Card } from './Card';
 export { Chip, SampleDataChip } from './Chip';
 export { Container } from './Container';

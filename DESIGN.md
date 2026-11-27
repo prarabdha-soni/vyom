@@ -17,39 +17,43 @@ content, structure and rules.** Where they differ, see "Deviations from the desi
 
 ## 1. Tokens
 
+> **Revised 2026-11-27 (owner decision): light theme.** The palette below replaces the
+> original dark navy palette across the public site and the signed-in console. Layout,
+> type, spacing and the logo are unchanged. The reference for the new look was a set of
+> screenshots of a light pharmacovigilance workspace; we match its palette and workspace
+> patterns, not its branding, wording or icons.
+
 ### Colour
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `bg-page` | `#070B14` | Page background, hero, footer |
-| `bg-alt` | `#0A0F1C` | Alternating section background, notice bar |
-| `bg-card` | `#0D1324` | Default card background |
-| `bg-raised` | `#111A2E` | Flagship card, icon tiles on `bg-card` |
-| `bg-panel` | `#0B1120` | Mock-screen panel body (hero, scorecard) |
-| `bg-panel-header` | `#0E1526` | Mock-screen header/footer bars, nested panels |
-| `border-hairline` | `#141C30` | Section dividers, table row rules, progress track |
-| `border-card` | `#1D2842` | Card borders, panel inner dividers |
-| `border-strong` | `#263355` | Panel outer border, chip border, icon-tile border |
-| `border-button` | `#2B3A5C` | Secondary button border |
-| `border-dashed` | `#3A4A70` | Dashed chips (`SAMPLE DATA`, `ROADMAP`), muted bar fill, arrow glyphs |
-| `text-primary` | `#EAF0FA` | Headings, strong body |
-| `text-secondary` | `#C9D2E3` | Nav links, list items, table body |
-| `text-muted` | `#A7B2C6` | Body paragraphs, card descriptions |
-| `text-meta` | `#8290A8` | Mono labels, eyebrow-grey, timestamps, sources |
-| `accent` | `#62AEF2` | **AI activity.** Eyebrows, primary button, active states |
-| `accent-tint` | `#62AEF2` @ 12% | Chip/mark/table-column fills on accent |
-| `accent-line` | `#62AEF2` @ 35% | Accent borders and rings |
-| `on-accent` | `#06101F` | Text on the accent button |
-| `amber` | `#F2B866` | **A human or physician decision.** Never for AI |
-| `amber-border` | `#5A4321` | Amber chip border |
-| `amber-bg` | `#241A0C` | Amber chip background |
-| `amber-highlight` | `#2A1E0D` | Amber `<mark>` background |
+| `page` | `#FCFCFD` | Page background |
+| `alt` | `#F5F6F9` | Alternating section background, notice bar |
+| `surface` | `#FFFFFF` | Cards, header, product frames |
+| `raised` | `#F3F4F7` | Hover and selected rows, icon tiles, filled grey chips |
+| `panel` / `panel-header` | `#FFFFFF` / `#F8F9FB` | Mock and console panels and their bars |
+| `hairline` | `#ECEEF3` | Dividers, table row rules |
+| `line` | `#E3E6ED` | Card borders |
+| `strong` | `#D6DAE3` | Panel outer border, default chip border |
+| `button` | `#D0D5DF` | Secondary button and input borders |
+| `dash` | `#AAB1C0` | Dashed chips (`SAMPLE DATA`, `ROADMAP`), not-yet-reached steps |
+| `primary` | `#0C0D12` | Headings, strong body |
+| `secondary` | `#2A2E38` | Nav links, list items, table body |
+| `muted` | `#535968` | Body paragraphs |
+| `meta` | `#646A79` | Mono labels, eyebrows, timestamps, sources |
+| `accent` | `#2563EB` | **AI activity only.** AI chips, AI steps, AI drafts |
+| `amber` | `#B45309` (+ `amber-soft` `#FDF6E8`, `amber-line` `#EFD09A`) | **A human or physician decision** |
+| `green` | `#15803D` (+ `green-fill` `#22A559`, `green-soft` `#EDF8F1`) | **Verified, complete, sealed.** Ticks, progress, traceable text |
+| `rose` | `#C62D42` (+ `rose-soft` `#FDF0F2`) | **Locked or overdue.** Data lock, overdue clocks |
+| `ink` | `#0C0D12` | Primary actions inside product screens, avatars |
+| `cta` | `#F7C948` | Marketing call-to-action pill (header, hero, CTA section) |
+| `mark` | `#ECEFF5` | Neutral highlight for rule-based (non-AI) text matches |
+| `wash-*` | lavender `#E9E6FC`, sky `#E2EDFC`, peach `#FDEADB` | The sky wash only |
 
-Alternative accents (swap in one place): `#4CC3B5`, `#9C93F2`.
-
-**Semantic rule, enforced everywhere:** blue accent = AI did this. Amber = a human
-decided this. A step that is waiting on a physician is amber; a step an agent completed
-is blue; a step not yet reached is `border-dashed` / `text-meta`.
+**Semantic rule, enforced everywhere:** blue = AI did this; amber = a human decided (or a
+decision is waiting on a human); green = verified or complete; rose = locked or overdue.
+A step not yet reached is `dash` / `meta`. Output from the rule-based demo engine is
+**not** AI and is never blue. Every text colour clears 4.5:1 on `page`, `alt` and `surface`.
 
 ### Type
 
@@ -87,9 +91,10 @@ Two families only, both via `next/font/google`:
 - Radii: **16px** cards and panels · **14px** stat/step cards and grid groups ·
   **12px** nested panels and large icon tiles · **10px** buttons and small icon tiles ·
   **8px** in-panel buttons · **6px** chips and marks · **999px** pills · **3–4px** progress bars.
-- Borders 1px throughout. **No gradients. No emoji. No stock illustration.**
-- Shadows **only** on the two mock panels (hero case run, vendor scorecard):
-  `0 48px 96px -48px rgba(0,0,0,0.9)`.
+- Borders 1px throughout. **No emoji. No stock illustration.** The only gradients are the
+  soft radial glows of the sky wash behind heroes and CTA sections.
+- Soft shadows only: `shadow-panel` on product frames and mock panels, `shadow-pop` on
+  menus, `shadow-tab` on the active segmented-control tab.
 - Interactive targets `min-height: 44px` (hero/CTA buttons 52px).
 
 ### Logo
@@ -110,26 +115,28 @@ Favicon is generated from the mark alone.
 - **Container** — 1280px, responsive side padding.
 - **Section** — `<section>` + vertical rhythm + optional `bg-alt` + bottom hairline.
 - **Eyebrow** — mono 12px accent label.
-- **Button** — `primary` (accent fill, `on-accent` text, radius 10), `secondary`
-  (`border-button`, radius 10), `panel` (radius 8, used inside mocks), `link` (accent + arrow).
+- **Button** — `primary` (sunlight `cta` pill, marketing calls to action), `secondary`
+  (white pill, `border-button`), `panelPrimary` (ink, radius 8, actions inside product
+  screens), `panel` (white, radius 8).
   Renders `<a>` or `<button>`; sizes `md` (44px) / `lg` (52px).
-- **Chip** — mono uppercase pill, radius 6. Variants: `default` (`border-strong`),
-  `accent` (`accent-line` + `accent-tint`), `amber`, `dashed` (`SAMPLE DATA`, `ROADMAP`).
+- **Chip** — mono uppercase, radius 6. Tones: `default`, `accent` (AI), `amber` (human
+  decision), `green` (verified/complete), `rose` (locked/overdue), `muted` (filled grey,
+  e.g. Draft), `dashed` (`SAMPLE DATA`, `ROADMAP`).
 - **Card** — radius 16/14, `bg-card` or `bg-raised`, `border-card` or `accent-line`.
 - **StatCard** — big numeral + description + mono source footnote pinned to the bottom.
 - **ProgressBar** — track `border-hairline`, fill `accent` / `amber` / `border-dashed`,
   heights 6px and 8px, `min-width: 4px` so tiny values stay visible.
 
 ### `components/site`
-Header, MegaMenu, Footer, NoticeBar, Logo, StarfieldBackground.
+Header, MegaMenu, Footer, NoticeBar, Logo, SkyWash.
 
-**StarfieldBackground** — absolutely positioned decorative SVG, `aria-hidden`,
-`preserveAspectRatio="xMidYMid slice"`, `pointer-events: none`. Two variants:
-- *hero* (`viewBox 0 0 1440 800`): three nested ellipses rotated −14° about (1010, 420)
-  with radii 720×300 (dashed `2 7`, `#1A2440`), 560×230 (`#1A243F`), 400×160 (`#151E35`);
-  a constellation polyline in `#22304F`; ~35 stars in `text-secondary` at 0.25–0.65 opacity,
-  r 0.7–1.7; and an accent focus dot (r3 filled + r7 ring at 35%).
-- *cta* (`viewBox 0 0 1440 600`): two concentric ellipses, 13 stars, one accent focus dot.
+**SkyWash** — absolutely positioned decorative SVG, `aria-hidden`, replacing the dark
+starfield. Soft radial glows in `wash-lavender`, `wash-sky` and `wash-peach`, the orbit
+ellipses in `strong`, and the accent satellite from the logo. Variants `hero` and `cta`.
+
+**MegaMenu** — the header's **Platform** trigger opens a full-width panel with the three
+modules side by side (kicker, name with a sunlight dot, one line on where it takes you)
+and links underneath. Radix NavigationMenu with a Viewport anchored to the header.
 
 ### `components/mocks`
 All carry a `SAMPLE DATA` chip and use only fictional codes (`VY-201`, `VY-305`,
@@ -275,3 +282,8 @@ Recorded so they are deliberate, not drift:
    but the prompt requires both routes.
 4. **`[YOUR EMAIL]`** stays visibly marked until replaced; it lives in `site.config.ts`.
 5. **Phone padding** (16px side, 64px section) is added; the design is a fixed 1440px canvas.
+6. **Light theme (2026-11-27).** The original dark navy palette is replaced by the light
+   palette in section 1, on the owner's instruction. The design mock still governs layout.
+7. **Three modules (2026-11-27).** The six products became Vyom Radar (intake and
+   literature), Vyom Verify (cases, medical review and quality checks) and Vyom Dossier
+   (periodic reports). Old product URLs redirect to the matching module.

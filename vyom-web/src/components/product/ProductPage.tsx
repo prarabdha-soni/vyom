@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Product } from '@/content/products';
 import { getProductNeighbours, statusLabel } from '@/content/products';
 import { ArrowRightIcon, CheckIcon, productIcons } from '@/components/icons';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { ButtonLink, Chip, Container, Eyebrow, Section } from '@/components/ui';
 import { productPage } from '@/content/productPage';
 import { SampleScreen } from './SampleScreen';
@@ -18,14 +18,14 @@ export function ProductPage({ product }: { readonly product: Product }) {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-hairline">
-        <StarfieldBackground variant="cta" />
+        <SkyWash variant="cta" />
         <Container className="relative flex flex-col gap-7 py-16 sm:py-24">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-surface text-accent">
+            <span className="flex size-[42px] shrink-0 items-center justify-center rounded-button border border-strong bg-surface text-primary">
               <Icon />
             </span>
             <span className="text-[17px] font-semibold text-primary">{product.name}</span>
-            <Chip tone={roadmap ? 'dashed' : 'accent'}>{statusLabel[product.status]}</Chip>
+            <Chip tone={roadmap ? 'dashed' : 'default'}>{statusLabel[product.status]}</Chip>
           </div>
 
           <h1 className="m-0 max-w-[920px] text-[clamp(36px,4.4vw,60px)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance text-primary">
@@ -77,7 +77,7 @@ export function ProductPage({ product }: { readonly product: Product }) {
                 key={capability}
                 className="flex items-start gap-3 text-[15.5px] leading-[1.5] text-secondary"
               >
-                <span className="mt-0.5 flex shrink-0 text-accent">
+                <span className="mt-0.5 flex shrink-0 text-green">
                   <CheckIcon />
                 </span>
                 <span>{capability}</span>
@@ -173,7 +173,7 @@ export function ProductPage({ product }: { readonly product: Product }) {
                 key={who}
                 className="flex items-start gap-3 rounded-card border border-line bg-surface px-6 py-5 text-[16px] leading-[1.5] text-secondary"
               >
-                <span className="mt-0.5 flex shrink-0 text-accent">
+                <span className="mt-0.5 flex shrink-0 text-green">
                   <CheckIcon />
                 </span>
                 <span>{who}</span>
@@ -220,9 +220,9 @@ function ProductNeighbour({
         {isNext ? 'NEXT' : 'PREVIOUS'}
       </span>
       <span className="flex items-center gap-2.5 text-[21px] font-semibold tracking-[-0.01em] text-primary">
-        {!isNext ? <ArrowRightIcon size={18} className="rotate-180 text-accent" /> : null}
+        {!isNext ? <ArrowRightIcon size={18} className="rotate-180 text-primary" /> : null}
         {product.name}
-        {isNext ? <ArrowRightIcon size={18} className="text-accent" /> : null}
+        {isNext ? <ArrowRightIcon size={18} className="text-primary" /> : null}
       </span>
       <span className="max-w-[420px] text-[15px] leading-[1.5] text-muted">{product.summary}</span>
     </Link>

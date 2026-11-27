@@ -1,7 +1,7 @@
 import { hero } from '@/content/home';
 import { ArrowRightIcon } from '@/components/icons';
 import { SafetyWorkspace } from '@/components/mocks';
-import { StarfieldBackground } from '@/components/site';
+import { SkyWash } from '@/components/site';
 import { ButtonLink, Container } from '@/components/ui';
 
 export function Hero() {
@@ -9,13 +9,13 @@ export function Hero() {
 
   return (
     <section id="top" className="relative overflow-hidden border-b border-hairline">
-      <StarfieldBackground variant="hero" />
+      <SkyWash variant="hero" />
 
       <Container className="relative flex flex-col items-center gap-[72px] pt-16 pb-16 sm:pt-[120px] sm:pb-[104px]">
         {/* Text block */}
         <div className="flex w-full max-w-[1080px] flex-col items-center gap-7 text-center">
           <span className="inline-flex items-center gap-[9px] rounded-full border border-strong bg-surface px-3 py-1.5 font-mono text-[12px] font-medium tracking-[0.08em] text-secondary">
-            <span className="size-1.5 shrink-0 rounded-full bg-accent" />
+            <span className="size-1.5 shrink-0 rounded-full bg-cta" />
             {hero.pill}
           </span>
 
@@ -25,7 +25,7 @@ export function Hero() {
           */}
           <h1 className="m-0 text-[clamp(34px,6vw,84px)] leading-[0.98] font-semibold tracking-[-0.042em] text-balance text-primary">
             {before}
-            <span className="text-accent underline decoration-accent-line decoration-[0.055em] underline-offset-[0.16em] [text-decoration-skip-ink:none]">
+            <span className="underline decoration-cta decoration-[0.08em] underline-offset-[0.14em] [text-decoration-skip-ink:none]">
               {highlight}
             </span>
             {after}

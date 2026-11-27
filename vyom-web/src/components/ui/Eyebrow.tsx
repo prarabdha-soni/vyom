@@ -1,6 +1,6 @@
 import { cn } from '@/lib/cn';
 
-/** Mono 12px accent label above a heading. */
+/** Mono 12px uppercase label above a heading. */
 export function Eyebrow({
   children,
   className,
@@ -11,7 +11,7 @@ export function Eyebrow({
   return (
     <span
       className={cn(
-        'font-mono text-[12px] font-medium tracking-[0.14em] text-accent uppercase',
+        'font-mono text-[12px] font-medium tracking-[0.14em] text-meta uppercase',
         className,
       )}
     >

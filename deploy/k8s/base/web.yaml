@@ -1,0 +1,88 @@
+# The Vyom console. Server-rendered pages carry case data, so in a client
+# deployment it runs here, next to the API, not on a third-party host.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vyom-web
+  labels: { app.kubernetes.io/name: vyom-web, app.kubernetes.io/component: console }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: vyom-web }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: vyom-web, app.kubernetes.io/component: console }
+    spec:
+      serviceAccountName: vyom-web
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: web
+          image: vyom-web
+          ports: [{ name: http, containerPort: 3000 }]
+          envFrom:
+            - configMapRef: { name: vyom-web-config }
+            - secretRef: { name: vyom-web-secrets }  # VYOM_SESSION_SECRET
+          readinessProbe:
+            httpGet: { path: /healthz/, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz/, port: http }
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+            - { name: next-cache, mountPath: /app/.next/cache }
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 128Mi }
+        - name: next-cache
+          emptyDir: { sizeLimit: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vyom-web
+  labels: { app.kubernetes.io/name: vyom-web }
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "vyom-web"}'
+spec:
+  type: ClusterIP
+  selector: { app.kubernetes.io/name: vyom-web }
+  ports: [{ name: http, port: 3000, targetPort: http }]
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: vyom-web
+spec:
+  timeoutSec: 60
+  healthCheck:
+    type: HTTP
+    requestPath: /healthz/
+    port: 3000
+  logging: { enable: true, sampleRate: 1.0 }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: vyom-web
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: vyom-web }

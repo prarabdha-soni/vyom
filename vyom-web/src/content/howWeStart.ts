@@ -91,7 +91,7 @@ export const howWeStartPage = {
       {
         question: 'Do we have to replace our safety database?',
         answer:
-          'No. Vyom Audit works against whatever system you already run. For case processing we produce E2B(R3) output, and connection to existing safety databases is on the roadmap for Vyom OS.',
+          'No. The quality checks in Vyom Verify work against whatever system you already run. For case processing we produce E2B(R3) output, and connection to existing safety databases is on the roadmap.',
       },
     ],
   },

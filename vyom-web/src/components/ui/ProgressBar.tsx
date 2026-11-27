@@ -1,11 +1,14 @@
 import { cn } from '@/lib/cn';
 
-export type BarTone = 'accent' | 'amber' | 'muted';
+export type BarTone = 'accent' | 'amber' | 'muted' | 'green' | 'ink' | 'rose';
 
 const fills: Record<BarTone, string> = {
   accent: 'bg-accent',
   amber: 'bg-amber',
   muted: 'bg-dash',
+  green: 'bg-green-fill',
+  ink: 'bg-primary',
+  rose: 'bg-rose',
 };
 
 /**

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFoundPage } from '@/content/legal';
 import { ArrowRightIcon } from '@/components/icons';
-import { Footer, Header, NoticeBar, StarfieldBackground } from '@/components/site';
+import { Footer, Header, NoticeBar, SkyWash } from '@/components/site';
 import { Container, Eyebrow } from '@/components/ui';
 
 export default function NotFound() {
@@ -11,10 +11,10 @@ export default function NotFound() {
       <Header />
       <main id="main">
         <section className="relative overflow-hidden border-b border-hairline">
-          <StarfieldBackground variant="cta" />
+          <SkyWash variant="cta" />
           <Container className="relative flex flex-col gap-7 py-24 sm:py-32">
             <div className="flex flex-col gap-5">
-              <span className="font-mono text-[clamp(56px,9vw,104px)] leading-none font-medium tracking-[-0.04em] text-accent">
+              <span className="font-mono text-[clamp(56px,9vw,104px)] leading-none font-medium tracking-[-0.04em] text-primary">
                 {notFoundPage.code}
               </span>
               <Eyebrow>{notFoundPage.eyebrow}</Eyebrow>
@@ -35,7 +35,7 @@ export default function NotFound() {
                       className="flex min-h-[44px] items-center gap-2 rounded-button border border-button px-4 text-[15px] font-medium text-secondary transition-colors hover:border-strong hover:bg-surface hover:text-primary"
                     >
                       {link.label}
-                      <ArrowRightIcon size={15} className="text-accent" />
+                      <ArrowRightIcon size={15} className="text-primary" />
                     </Link>
                   </li>
                 ))}

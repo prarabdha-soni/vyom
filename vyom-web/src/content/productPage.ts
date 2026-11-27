@@ -5,7 +5,7 @@ export const productPage = {
   cta: {
     href: '/contact',
     label: 'Get a free benchmark',
-    /** Roadmap products cannot be benchmarked yet, so they ask differently. */
+    /** Roadmap modules cannot be benchmarked yet, so they ask differently. */
     roadmapLabel: 'Talk to us about this',
   },
 
@@ -33,14 +33,14 @@ export const productPage = {
 
 /** The /products index page. */
 export const productsIndex = {
-  eyebrow: 'PRODUCTS',
-  heading: 'One safety system. Six products.',
-  lead: 'Start with one workflow and add the rest as trust grows. Every product shares the same agents, rules and evidence trail.',
+  eyebrow: 'MODULES',
+  heading: 'One safety system. Three modules.',
+  lead: 'Radar takes in and screens, Verify processes and approves cases, Dossier writes the periodic reports. Start with one and add the rest as trust grows; all three share the same rules and evidence trail.',
 
   matrixEyebrow: 'CAPABILITY MATRIX',
-  matrixHeading: 'What each product covers.',
+  matrixHeading: 'What each module covers.',
   matrixLead:
-    'A tick marks a capability the product states today. Nothing is inferred, so an empty cell means we are not claiming it yet.',
+    'A tick marks a capability the module states today. Nothing is inferred, so an empty cell means we are not claiming it yet.',
   matrixColumnLabel: 'CAPABILITY',
   plannedLabel: 'Planned',
 } as const;
