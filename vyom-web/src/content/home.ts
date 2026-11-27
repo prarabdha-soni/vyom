@@ -26,10 +26,14 @@ export const hero = {
   subline:
     'Turn fragmented safety data and manual workflows into connected, intelligent and traceable safety operations.',
   /**
-   * Beside the pill, at the top of the hero. Opens the sample dashboard directly (as the PV reviewer;
-   * the top bar switches role). Shown only while the sample workspace is on.
+   * The first thing in the hero: opens the sample dashboard directly (as the PV reviewer; the top bar
+   * switches role). Shown only while the sample workspace is on.
    */
-  sampleWorkspace: { label: 'Try the sample workspace', href: '/demo-pharma/dashboard/' },
+  sampleWorkspace: {
+    label: 'Explore the sample workspace',
+    detail: 'Demo Pharma (FICTIONAL), no sign-up',
+    href: '/demo-pharma/dashboard/',
+  },
   primaryCta: { label: 'Book a Demo', href: '/book-demo' },
   secondaryCta: { label: 'Explore the Platform', href: '/platform' },
   footnote: 'Vyom connects and checks the evidence. Qualified people review it and decide.',
