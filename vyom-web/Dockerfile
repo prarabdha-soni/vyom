@@ -13,7 +13,11 @@ WORKDIR /app
 ARG NEXT_PUBLIC_SITE_URL=""
 ARG NEXT_PUBLIC_API_URL=""
 ARG NEXT_PUBLIC_ROOT_DOMAIN=""
+# off: pre-rendered pages (the home page's sample link) leave the sample workspace out.
+# The runtime VYOM_SAMPLE_WORKSPACE still decides sign-in; set both to off for client data.
+ARG VYOM_SAMPLE_WORKSPACE=""
 ENV NEXT_TELEMETRY_DISABLED=1 \
+    VYOM_SAMPLE_WORKSPACE=$VYOM_SAMPLE_WORKSPACE \
     NEXT_OUTPUT=standalone \
     NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \

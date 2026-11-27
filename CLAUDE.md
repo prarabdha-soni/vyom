@@ -106,6 +106,9 @@ site.config.ts
 - Every console page loads through `lib/console/data.ts`, which serves either
   Vyom OS (live session) or the sample snapshot (`vyom_session=sample:<role>`).
   Mutations in `lib/console/actions.ts` never send anything in sample mode.
+  Without a session, any `/demo-pharma/…` URL opens the sample workspace
+  directly as the PV reviewer (the gateway sets the cookie); an expired live
+  session still goes to `/login`.
 - The sample snapshot's dates are shifted to today on load. Regenerate it from a
   seeded Vyom OS (see `content/sample-workspace/README.md`) rather than editing
   numbers by hand.
