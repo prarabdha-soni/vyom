@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { siteConfig } from '~/site.config';
 import { hero } from '@/content/home';
-import { ArrowRightIcon } from '@/components/icons';
+import { ArrowRightIcon, GridIcon } from '@/components/icons';
 import { SafetyWorkspace } from '@/components/mocks';
 import { SkyWash } from '@/components/site';
 import { ButtonLink, Container } from '@/components/ui';
+
+const PILL =
+  'inline-flex items-center gap-[9px] rounded-full border border-strong bg-surface px-3 py-1.5 font-mono text-[12px] font-medium tracking-[0.08em] text-secondary';
 
 export function Hero() {
   const { before, highlight, after } = hero.headline;
@@ -16,22 +19,41 @@ export function Hero() {
       <Container className="relative flex flex-col items-center gap-[72px] pt-16 pb-16 sm:pt-[120px] sm:pb-[104px]">
         {/* Text block */}
         <div className="flex w-full max-w-[1080px] flex-col items-center gap-7 text-center">
-          {/* The pill and, while it is on, a way straight into the sample workspace. Wraps to two lines on phones. */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5">
-            <span className="inline-flex items-center gap-[9px] rounded-full border border-strong bg-surface px-3 py-1.5 font-mono text-[12px] font-medium tracking-[0.08em] text-secondary">
-              <span className="size-1.5 shrink-0 rounded-full bg-cta" />
-              {hero.pill}
-            </span>
-            {siteConfig.sampleWorkspace ? (
-              <Link
-                href={hero.sampleWorkspace.href}
-                className="group relative inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-strong bg-surface px-3.5 py-1 text-[13.5px] font-medium text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] hover:border-primary"
+          {siteConfig.sampleWorkspace ? (
+            /*
+              The way into the product, so it leads the hero: a large card-pill with
+              a soft sunlight halo (the marketing call-to-action colour). It opens
+              the sample dashboard directly; no sign-up, nothing is saved.
+            */
+            <Link
+              href={hero.sampleWorkspace.href}
+              className="group mb-2 inline-flex min-h-[64px] max-w-full items-center gap-4 rounded-full border border-strong bg-surface py-2 pr-2 pl-6 text-left shadow-[var(--shadow-pop)] ring-[5px] ring-cta/30 transition-[border-color,box-shadow] duration-150 hover:border-dash hover:ring-cta/55 sm:pl-2"
+            >
+              <span
+                aria-hidden="true"
+                className="hidden size-12 shrink-0 place-items-center rounded-full border border-hairline bg-alt text-primary sm:grid"
               >
-                {hero.sampleWorkspace.label}
-                <ArrowRightIcon size={15} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            ) : null}
-          </div>
+                <GridIcon size={20} />
+              </span>
+              <span className="flex min-w-0 flex-col gap-0.5 sm:pr-2">
+                <span className="text-[17px] leading-[1.25] font-semibold tracking-[-0.01em] text-primary sm:text-[18px]">
+                  {hero.sampleWorkspace.label}
+                </span>{' '}
+                <span className="text-[13.5px] leading-[1.35] text-muted">{hero.sampleWorkspace.detail}</span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-on-ink transition-transform duration-150 group-hover:translate-x-0.5"
+              >
+                <ArrowRightIcon size={18} />
+              </span>
+            </Link>
+          ) : null}
+
+          <span className={PILL}>
+            <span className="size-1.5 shrink-0 rounded-full bg-cta" />
+            {hero.pill}
+          </span>
 
           {/*
             One sentence, wrapping naturally. `text-balance` keeps the last
