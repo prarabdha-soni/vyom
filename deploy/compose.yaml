@@ -8,11 +8,21 @@
 # on 127.0.0.1; the API and the database stay on the internal network.
 name: vyom
 
+# The same restrictions as the GKE pods: read-only root, no capabilities, no
+# privilege escalation, a non-root user (set in each image), and writable
+# scratch space only where the manifests mount an emptyDir.
+x-hardened: &hardened
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+
 x-os: &os
+  <<: *hardened
   image: vyom-os:local
   build: ../vyom-os
   restart: "no"
   networks: [internal]
+  tmpfs: ["/tmp:size=64m,uid=10001,gid=10001"]
 
 x-os-env: &os-env
   # vyom_service bypasses row-level security (jobs, sign-in); vyom_app never does (requests).
@@ -70,9 +80,13 @@ services:
       start_period: 10s
 
   web:
+    <<: *hardened
     image: vyom-web:local
     build: ../vyom-web
     restart: unless-stopped
+    tmpfs:
+      - "/tmp:size=64m,uid=10001,gid=10001"
+      - "/app/.next/cache:size=256m,uid=10001,gid=10001"
     environment:
       VYOM_OS_URL: http://api:8000
       VYOM_SESSION_SECRET: ${VYOM_SESSION_SECRET}

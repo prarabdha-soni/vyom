@@ -25,9 +25,11 @@ capability is not under **Shipped**, describe it as planned.
 - **Production build:** the console's standalone server build. This covered
   the health check, live sign-in, `Secure` and `HttpOnly` session cookies,
   and turning the sample workspace off.
+- **Containers:** both images built for `arm64` and `amd64`. The Compose stack
+  ran end to end with the cluster's restrictions (read-only root filesystem,
+  no capabilities, non-root): migrations, the seed, every role's console flow,
+  `vyom-admin` and the sweep. The images contain no env files or keys.
 - **Not yet run:**
-  - building the Docker images and running the Compose stack, because Docker
-    was unavailable on the build machine;
   - anything on GCP;
   - Vertex AI;
   - PubMed from a deployment. The PubMed client is tested with mocked
@@ -37,7 +39,7 @@ capability is not under **Shipped**, describe it as planned.
 
 | Capability | State |
 | --- | --- |
-| Weekly sweep per product (PubMed; Europe PMC optional), as a Monday CronJob | Shipped (fixtures); live PubMed is Demo only |
+| Weekly sweep per product (PubMed; Europe PMC optional), as a Monday CronJob | Shipped (fixtures); live PubMed is Demo only. Demo mode sweeps only fictional tenants, so sample articles never reach a real one |
 | Append-only ledger of every article and decision, with model, sampler, schema and threshold versions | Shipped |
 | Screening questions with answer probabilities, routed to red / yellow / green bands by a deterministic router | Shipped; the answers come from the demo engine until Vertex is live |
 | Reviewer decision: valid ICSR, safety information, not relevant, or escalate | Shipped |
@@ -105,8 +107,8 @@ capability is not under **Shipped**, describe it as planned.
 
 | Capability | State |
 | --- | --- |
-| Dockerfiles for both apps (non-root, read-only root filesystem in the cluster) | Written; **images not yet built** |
-| Docker Compose stack for a laptop or a demo machine | Written and validated with `docker compose config`; **not yet run** |
+| Dockerfiles for both apps (non-root, read-only root filesystem) | Built for `arm64` and `amd64`; run under the cluster's restrictions |
+| Docker Compose stack for a laptop or a demo machine | Run end to end (2026-11-27) |
 | GKE Autopilot manifests: Cloud SQL Auth Proxy sidecar, Workload Identity, managed TLS, NetworkPolicies, the restricted Pod Security level, the migration Job and the weekly CronJob | Written; render with `kubectl kustomize`; **not yet applied** |
 | Migration runner with a checksum ledger, and refusal of edited history | Shipped |
 | Runbook: setup, release, rollback, onboarding, backups, rotation | `deploy/RUNBOOK.md` |

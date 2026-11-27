@@ -74,8 +74,10 @@ export function ButtonLink({
   >) {
   const classes = classesFor(variant, size, className);
   const external = href.startsWith('mailto:') || href.startsWith('http');
+  // A download is a file from a route handler, not a page: <Link> would prefetch it on every view.
+  const download = rest.download !== undefined && rest.download !== false;
 
-  if (external) {
+  if (external || download) {
     return (
       <a href={href} className={classes} {...rest}>
         {children}

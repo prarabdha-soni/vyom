@@ -5,13 +5,13 @@ client environment uses GKE Autopilot with Cloud SQL in the client's region.
 The public marketing site and the fictional sample workspace can stay on
 Vercel (see `DEPLOY.md`).
 
-> **Status (2026-11-27).** The manifests render with `kubectl kustomize`. The
-> Compose file passes `docker compose config`. The images' contents have been
-> tested outside Docker: the production server build, migrations and the
-> admin command. The `gcloud` steps have **not** been run against a real
-> project yet. Rehearse the whole of §2–§5 on a staging project before a
-> client environment. `CAPABILITIES.md` lists what is shipped, demo-only or
-> planned.
+> **Status (2026-11-27).** Both images build for `arm64` and `amd64`. The
+> Compose stack has run end to end with the cluster's restrictions (read-only
+> root, no capabilities, non-root): migrations, the seed, every role's console
+> flow, `vyom-admin` and the sweep. The manifests render with `kubectl
+> kustomize`. The `gcloud` steps have **not** been run against a real project
+> yet. Rehearse the whole of §2–§5 on a staging project before a client
+> environment. `CAPABILITIES.md` lists what is shipped, demo-only or planned.
 
 Contents: [0 What runs where](#0-what-runs-where) ·
 [1 Local stack](#1-local-stack-docker-compose) ·
@@ -102,8 +102,10 @@ Open <http://localhost:3000/login/>. Sign in as `reviewer@demo-pharma.example`,
 | Stop (keeps data) | `down` |
 | Stop and **delete the database** | `down -v` (permanent) |
 
-The sweep skips fictional tenants unless you pass `--include-fictional`. In
-demo mode it reads fixtures and does not call PubMed.
+The sweep skips fictional tenants unless you pass `--include-fictional`. Demo
+mode sweeps only fictional tenants, from the sample articles, and never calls
+PubMed. A real tenant is skipped until the deployment runs in live mode, so
+sample articles never reach a client's queue.
 
 ---
 
@@ -491,9 +493,9 @@ or in Cloud Logging.
 
 ### 7.2 The weekly literature sweep
 
-The sweep runs every Monday at 02:30 IST for every client tenant. If a tenant's
-sweep fails, the failure is recorded as an ops alert, visible on `/ops`, and
-the other tenants still run. To run it now:
+The sweep runs every Monday at 02:30 IST for every client tenant (live mode
+only; demo mode skips them). If a tenant's sweep fails, the failure is recorded
+as an ops alert, visible on `/ops`, and the other tenants still run. To run it now:
 
 ```bash
 kubectl -n vyom create job --from=cronjob/vyom-weekly-sweep "sweep-manual-$(date +%Y%m%d%H%M)"

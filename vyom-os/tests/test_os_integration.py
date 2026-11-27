@@ -20,11 +20,11 @@ import psycopg
 import pytest
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
-from vyom_os import admin, cases, migrate
+from vyom_os import admin, cases, literature, migrate
 from vyom_os.ai.gateway import AiGateway
 from vyom_os.api import create_app, database_cost_sink
 from vyom_os.audit import Actor
-from vyom_os.core import Ctx
+from vyom_os.core import Conflict, Ctx
 from vyom_os.db import Database, fetch_value
 from vyom_os.security import Authorizer
 from vyom_os.seed import seed
@@ -350,6 +350,24 @@ def test_admin_creates_the_operations_tenant_once(env):
     finally:
         with psycopg.connect(ADMIN_URL, autocommit=True) as connection:
             connection.execute(f'drop database if exists "{name}" with (force)')
+
+
+def test_demo_mode_never_puts_sample_articles_in_a_real_tenant(env):
+    db = env["db"]
+    admin.create_tenant(db, "real-pharma", "Real Pharma")
+    admin.add_product(db, "real-pharma", {"code": "RP-1", "name": "Realzole", "active_ingredient": "realzole",
+                                          "reference_safety_terms": ["headache"], "rsi_version": "v1"})
+    with db.service() as connection:
+        tenant = load_tenant_by_slug(connection, "real-pharma")
+        authorizer = Authorizer.load(connection)
+    ctx = Ctx(tenant=tenant, actor=Actor.system(), today=env["settings"].today(), authorizer=authorizer,
+              gateway=env["gateway"])
+    with pytest.raises(Conflict, match="fictional sample tenant"):
+        with db.tenant(tenant.id) as connection:
+            literature.sweep(connection, ctx)
+    with db.tenant(tenant.id) as connection:
+        assert fetch_value(connection, "select count(*) from clinical_states where domain = 'pv_literature'") == 0
+        assert fetch_value(connection, "select count(*) from graph_edges") == 0
 
 
 def test_admin_onboards_and_offboards_a_client(env, tmp_path):

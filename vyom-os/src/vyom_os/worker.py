@@ -45,6 +45,10 @@ def main(argv: list[str] | None = None) -> None:
     for tenant in tenants:
         if tenant is None or tenant.slug == "bootstrap" or (tenant.is_fictional and not args.include_fictional):
             continue
+        if gateway.mode == "demo" and not tenant.is_fictional:
+            # Not a failure: demo mode never sweeps a real tenant (no live sources, no sample articles).
+            results.append({"tenant": tenant.slug, "skipped": "demo mode sweeps only fictional tenants"})
+            continue
         ctx = Ctx(tenant=tenant, actor=Actor.system(), today=today, authorizer=authorizer, gateway=gateway)
         try:
             with db.tenant(tenant.id) as connection:

@@ -106,6 +106,12 @@ def _fetch_live(products: list[dict[str, Any]], from_date: date, to_date: date) 
     return records
 
 
+DEMO_MODE_REAL_TENANT = (
+    "This deployment runs the rule-based demo engine, which works only on the fictional sample tenant. "
+    "Literature sweeps for real products run in live mode."
+)
+
+
 def sweep(connection: Any, ctx: Ctx, *, from_date: date | None = None, to_date: date | None = None) -> dict[str, Any]:
     """Fetch and screen one window of literature for every active product."""
     to_date = to_date or ctx.today
@@ -115,7 +121,11 @@ def sweep(connection: Any, ctx: Ctx, *, from_date: date | None = None, to_date: 
     products = list_products(connection, active_only=True)
     if not products:
         raise Conflict("Add a product before running a literature sweep.")
-    demo_data = ctx.gateway.mode == "demo" or ctx.tenant.is_fictional
+    # The fictional sample articles belong to fictional tenants only. A real tenant is swept from the live
+    # sources, which demo mode does not use: its rule engine is tuned to the sample, not to real reports.
+    demo_data = ctx.tenant.is_fictional
+    if not demo_data and ctx.gateway.mode == "demo":
+        raise Conflict(DEMO_MODE_REAL_TENANT)
     records = demo_records(ctx.today) if demo_data else _fetch_live(products, from_date, to_date)
     router = ctx.gateway.literature_router()
     stats = screen_public_records(records, connection=connection, router=router, tenant_id=ctx.tenant.id)
